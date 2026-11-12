@@ -50,7 +50,7 @@ export default async function OccasionsPage() {
                 href="https://wa.me/201023182006"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full bg-[#25D366] text-white px-4 py-2 text-xs font-black inline-flex items-center gap-1.5"
+                className="rounded-full bg-[#111111] hover:bg-black text-[#FFD21A] border border-[#FFD21A]/35 px-4 py-2 text-xs font-en font-black inline-flex items-center gap-1.5 transition"
               >
                 <WhatsAppIcon className="w-4 h-4" />
                 <span>WhatsApp 01023182006</span>

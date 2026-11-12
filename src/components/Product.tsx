@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
+import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 import { useStore } from "./store";
 import {
   CheckIcon,
@@ -246,17 +247,14 @@ export function ProductModal({
   const addonsTotal = chosen.reduce((s, a) => s + a.price, 0);
   const unit = (size?.price ?? 0) + addonsTotal;
 
+  useLockBodyScroll(true);
+
   useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   const toggleQuickNote = (chip: string) => {
@@ -291,20 +289,20 @@ export function ProductModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[90] flex items-stretch sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-[90] flex items-stretch sm:items-center justify-center p-0 sm:p-4 overscroll-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-product-title"
       onClick={onClose}
     >
-      <div className="hidden sm:block absolute inset-0 bg-[#111111]/70 backdrop-blur-md" />
+      <div className="hidden sm:block absolute inset-0 bg-[#111111]/70 backdrop-blur-md touch-none" />
 
       <div
         className="relative w-full h-dvh sm:h-auto sm:max-w-2xl bg-white rounded-none sm:rounded-[28px] shadow-2xl overflow-hidden sm:max-h-[88vh] flex flex-col md:flex-row sm:border border-[#B90D12]/25"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Visual Showcase Column */}
-        <div className="relative h-60 sm:h-auto md:w-[45%] shrink-0 bg-[#FFF8E8] overflow-hidden flex items-center justify-center">
+        <div className="relative h-56 sm:h-auto md:w-[45%] shrink-0 bg-[#FFF8E8] overflow-hidden flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={product.image}
@@ -316,7 +314,7 @@ export function ProductModal({
             type="button"
             onClick={onClose}
             aria-label="إغلاق"
-            className="md:hidden absolute top-3.5 start-3.5 z-20 w-10 h-10 rounded-full bg-white/95 text-[#111111] grid place-items-center shadow-lg cursor-pointer"
+            className="md:hidden absolute top-3.5 end-3.5 z-20 w-10 h-10 rounded-full bg-white/95 text-[#111111] grid place-items-center shadow-lg cursor-pointer"
           >
             <XIcon className="w-5 h-5" />
           </button>
@@ -330,7 +328,10 @@ export function ProductModal({
 
         {/* Customization Column */}
         <div className="flex-1 flex flex-col min-h-0 bg-white">
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+          <div
+            data-modal-scroll
+            className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-5 sm:p-6 space-y-4"
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2
@@ -437,7 +438,7 @@ export function ProductModal({
                 <NoteIcon className="w-3.5 h-3.5 text-[#B90D12]" />
                 <span>ملاحظات التحضير (اختياري)</span>
               </div>
-              <div className="flex flex-wrap gap-1.5 mb-2">
+              <div className="grid grid-cols-2 gap-1.5 mb-2">
                 {SHAWARMA_QUICK_NOTES.map((chip) => {
                   const active = note.includes(chip);
                   return (
@@ -445,10 +446,10 @@ export function ProductModal({
                       key={chip}
                       type="button"
                       onClick={() => toggleQuickNote(chip)}
-                      className={`px-3 py-1 rounded-full text-[11px] font-extrabold border transition cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-xl text-center text-[11px] font-extrabold border transition cursor-pointer truncate ${
                         active
                           ? "bg-[#FFD21A] text-[#111111] border-[#FFD21A]"
-                          : "bg-[#FFF8E8] text-[#111111]/75 border-[#111111]/10 hover:border-[#B90D12]"
+                          : "bg-[#FFF8E8] text-[#111111]/80 border-[#111111]/10 hover:border-[#B90D12]"
                       }`}
                     >
                       {chip}
@@ -492,7 +493,7 @@ export function ProductModal({
               onClick={add}
               className={`flex-1 rounded-full py-3 px-5 font-black text-sm flex items-center justify-between transition cursor-pointer shadow-md ${
                 added
-                  ? "bg-[#19B536] text-white"
+                  ? "bg-[#111111] text-[#FFD21A]"
                   : "bg-[#B90D12] hover:bg-[#780508] text-white"
               }`}
             >

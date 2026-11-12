@@ -5,24 +5,19 @@ import type { Category, Product } from "@/lib/types";
 import { ProductCard } from "./Product";
 import { useStore } from "./store";
 import {
-  ExternalLinkIcon,
-  FireIcon,
   GridIcon,
   ListIcon,
   PinIcon,
-  QrCodeIcon,
   SearchIcon,
-  SparkleIcon,
-  UsersIcon,
   XIcon,
 } from "./icons";
 
 const filters = [
-  { id: "all", label: "كل الأقسام", icon: null },
-  { id: "best", label: "الأكثر طلبًا", icon: "fire" as const },
-  { id: "shawarma", label: "الشاورما والعربي", icon: "sparkle" as const },
-  { id: "chicken", label: "البروستد والمشوي", icon: null },
-  { id: "family", label: "وجبات العيلة", icon: "users" as const },
+  { id: "all", label: "كل الأقسام" },
+  { id: "best", label: "الأكثر طلبًا" },
+  { id: "shawarma", label: "الشاورما والعربي" },
+  { id: "chicken", label: "البروستد والمشوي" },
+  { id: "family", label: "وجبات العيلة" },
 ];
 
 const categoryDescriptions: Record<string, string> = {
@@ -390,23 +385,19 @@ export default function MenuClient({
     }, 650);
   };
 
-  const openQr = () => {
-    window.dispatchEvent(new CustomEvent("open-menu-qr"));
-  };
-
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 w-full min-w-0">
-      {/* Top Search + View Switcher + PDF + QR Bar */}
-      <div className="bg-white rounded-[28px] p-4 sm:p-5 border border-[#B90D12]/18 shadow-[0_10px_28px_-14px_rgba(185,13,18,0.12)] space-y-3.5">
-        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+    <div className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-5 w-full min-w-0">
+      {/* Clean Symmetrical Search + View Switcher + Filter Strip */}
+      <div className="bg-white rounded-[26px] p-3.5 sm:p-4 border border-[#B90D12]/16 shadow-[0_10px_28px_-14px_rgba(185,13,18,0.1)] space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
           {/* Search Input */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-0">
             <SearchIcon className="w-4 h-4 text-[#B90D12] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="ابحث في منيو مأكولات الشام (شاورما صاج، عربي دبل، فرخة بروستد، فتة موتزاريلا، بيتزا…)"
+              placeholder="ابحث في المنيو (شاورما صاج، عربي دبل، فرخة بروستد، فتة…)"
               className="w-full rounded-full border border-[#111111]/14 bg-[#FFF8E8]/65 focus:bg-white focus:border-[#B90D12] focus:outline-none pr-10 pl-9 py-2.5 text-xs sm:text-sm font-bold text-[#111111]"
             />
             {q && (
@@ -421,91 +412,67 @@ export default function MenuClient({
             )}
           </div>
 
-          {/* View Mode + PDF + QR Controls */}
-          <div className="flex items-center gap-2 flex-wrap shrink-0">
-            <div className="inline-flex rounded-full bg-[#FFF8E8] border border-[#B90D12]/15 p-1">
+          {/* Symmetrical Segmented View Switcher + Branch */}
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+            <div className="grid grid-cols-2 flex-1 sm:flex-initial rounded-full bg-[#FFF8E8] border border-[#B90D12]/15 p-1">
               <button
                 type="button"
                 onClick={() => setView("menu")}
-                className={`rounded-full px-3 py-1.5 text-xs font-black inline-flex items-center gap-1.5 transition cursor-pointer ${
+                className={`rounded-full px-3.5 py-1.5 text-xs font-black inline-flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   view === "menu"
                     ? "bg-[#B90D12] text-white shadow-xs"
                     : "text-[#111111]/75 hover:text-[#B90D12]"
                 }`}
               >
-                <ListIcon className="w-3.5 h-3.5" />
-                <span>قائمة المنيو</span>
+                <ListIcon className="w-3.5 h-3.5 shrink-0" />
+                <span>قائمة</span>
               </button>
               <button
                 type="button"
                 onClick={() => setView("grid")}
-                className={`rounded-full px-3 py-1.5 text-xs font-black inline-flex items-center gap-1.5 transition cursor-pointer ${
+                className={`rounded-full px-3.5 py-1.5 text-xs font-black inline-flex items-center justify-center gap-1.5 transition cursor-pointer ${
                   view === "grid"
                     ? "bg-[#B90D12] text-white shadow-xs"
                     : "text-[#111111]/75 hover:text-[#B90D12]"
                 }`}
               >
-                <GridIcon className="w-3.5 h-3.5" />
-                <span>بطاقات مصورة</span>
+                <GridIcon className="w-3.5 h-3.5 shrink-0" />
+                <span>بطاقات</span>
               </button>
             </div>
 
-            <a
-              href="/menu/maakolat-alsham-menu.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full bg-[#FFD21A] hover:bg-[#F2A900] text-[#111111] px-3.5 py-2 text-xs font-black inline-flex items-center gap-1.5 transition"
-            >
-              <span>منيو PDF</span>
-              <ExternalLinkIcon className="w-3.5 h-3.5" />
-            </a>
-
-            <button
-              type="button"
-              onClick={openQr}
-              className="rounded-full bg-[#111111] hover:bg-[#B90D12] text-white px-3.5 py-2 text-xs font-black inline-flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <QrCodeIcon className="w-3.5 h-3.5 text-[#FFD21A]" />
-              <span className="font-en">QR</span>
-            </button>
+            {hydrated && branch && (
+              <button
+                type="button"
+                onClick={openPicker}
+                className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-[#FFF8E8] hover:bg-[#FFD21A] border border-[#B90D12]/20 px-3 py-2 text-[11px] font-black text-[#B90D12] hover:text-[#111111] transition cursor-pointer"
+              >
+                <PinIcon className="w-3.5 h-3.5 shrink-0" />
+                <span>إيجل مول</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Filter Chips + Active Branch Pill */}
-        <div className="flex items-center justify-between gap-2 flex-wrap pt-1">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            {filters.map((f) => {
-              const active = filter === f.id;
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFilter(f.id)}
-                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-black inline-flex items-center gap-1.5 border transition cursor-pointer ${
-                    active
-                      ? "bg-[#B90D12] text-white border-[#B90D12]"
-                      : "bg-[#FFF8E8] text-[#111111]/80 border-[#111111]/10 hover:border-[#B90D12]"
-                  }`}
-                >
-                  {f.icon === "fire" && <FireIcon className="w-3.5 h-3.5 text-[#FFD21A]" />}
-                  {f.icon === "sparkle" && <SparkleIcon className="w-3.5 h-3.5 text-[#FFD21A]" />}
-                  {f.icon === "users" && <UsersIcon className="w-3.5 h-3.5" />}
-                  <span>{f.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {hydrated && branch && (
-            <button
-              type="button"
-              onClick={openPicker}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF8E8] hover:bg-[#FFD21A] border border-[#B90D12]/20 px-3 py-1 text-[11px] font-black text-[#B90D12] hover:text-[#111111] transition cursor-pointer"
-            >
-              <PinIcon className="w-3.5 h-3.5 shrink-0" />
-              <span>{branch.name}</span>
-            </button>
-          )}
+        {/* Horizontal Swipeable Filter Chips (Zero Cartoon Icons) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+          {filters.map((f) => {
+            const active = filter === f.id;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-black border transition cursor-pointer ${
+                  active
+                    ? "bg-[#B90D12] text-white border-[#B90D12]"
+                    : "bg-[#FFF8E8] text-[#111111]/80 border-[#111111]/10 hover:border-[#B90D12]"
+                }`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

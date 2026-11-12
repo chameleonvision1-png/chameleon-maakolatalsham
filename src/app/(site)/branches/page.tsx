@@ -159,7 +159,7 @@ export default async function BranchesPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 dir="ltr"
-                className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:brightness-105 text-white font-en font-black text-xs sm:text-sm px-5 py-2.5 shadow-sm transition"
+                className="inline-flex items-center gap-2 rounded-full bg-[#B90D12] hover:bg-[#FFD21A] text-white hover:text-[#111111] font-en font-black text-xs sm:text-sm px-5 py-2.5 shadow-sm transition"
               >
                 <WhatsAppIcon className="w-4 h-4" />
                 <span>WhatsApp: 01023182006</span>

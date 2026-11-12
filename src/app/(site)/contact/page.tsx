@@ -99,7 +99,7 @@ export default async function ContactPage() {
               target="_blank"
               rel="noopener noreferrer"
               dir="ltr"
-              className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:brightness-105 text-white font-en font-black text-xs sm:text-sm px-6 py-3 shadow-sm transition shrink-0"
+              className="inline-flex items-center gap-2 rounded-full bg-[#111111] hover:bg-white text-[#FFD21A] hover:text-[#B90D12] border border-[#FFD21A]/40 font-en font-black text-xs sm:text-sm px-6 py-3 shadow-sm transition shrink-0"
             >
               <WhatsAppIcon className="w-4 h-4" />
               <span>WhatsApp: 01023182006</span>
@@ -129,12 +129,12 @@ export default async function ContactPage() {
             </a>
           </div>
 
-          <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="mt-5 flex overflow-x-auto snap-x snap-mandatory gap-3 no-scrollbar pb-1 sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:overflow-visible">
             {ORDER_PHONES.map((p, idx) => (
               <a
                 key={p.number}
                 href={`tel:${p.number}`}
-                className={`rounded-2xl p-4 border transition flex flex-col justify-between gap-2 ${
+                className={`w-[220px] sm:w-auto shrink-0 snap-start rounded-2xl p-4 border transition flex flex-col justify-between gap-2 ${
                   idx === 0
                     ? "bg-[#B90D12] hover:bg-[#780508] text-white border-[#B90D12]"
                     : "bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#111111] border-[#B90D12]/20"

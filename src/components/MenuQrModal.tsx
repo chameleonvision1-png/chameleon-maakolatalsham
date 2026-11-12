@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { generateQrMatrix } from "@/lib/qrcode";
+import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 import {
   CheckIcon,
   CopyIcon,
   DownloadAppIcon,
   FacebookIcon,
   PrintIcon,
-  QrCodeIcon,
   ShareNodesIcon,
   TelegramIcon,
   WhatsAppIcon,
@@ -34,6 +34,8 @@ export default function MenuQrModal({
 
   const matrix = useMemo(() => generateQrMatrix(MENU_URL, "Q"), []);
   const size = matrix.length;
+
+  useLockBodyScroll(open);
 
   useEffect(() => {
     if (!open) return;
@@ -281,26 +283,26 @@ export default function MenuQrModal({
     {
       name: "واتساب",
       href: `https://wa.me/?text=${encodedMsg}`,
-      cls: "bg-[#25D366] text-white hover:brightness-105",
+      cls: "bg-[#B90D12] text-white hover:bg-[#780508]",
       icon: <WhatsAppIcon className="w-4 h-4" />,
     },
     {
       name: "فيسبوك",
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-      cls: "bg-[#1877F2] text-white hover:brightness-105",
+      cls: "bg-[#111111] text-[#FFD21A] hover:bg-black",
       icon: <FacebookIcon className="w-4 h-4" />,
     },
     {
       name: "تيليجرام",
       href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTextOnly}`,
-      cls: "bg-[#229ED9] text-white hover:brightness-105",
-      icon: <TelegramIcon className="w-4 h-4" />,
+      cls: "bg-white text-[#111111] border border-[#B90D12]/20 hover:bg-[#FFD21A]",
+      icon: <TelegramIcon className="w-4 h-4 text-[#B90D12]" />,
     },
     {
       name: "منصة X",
       href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTextOnly}`,
-      cls: "bg-[#111111] text-white hover:bg-black",
-      icon: <XSocialIcon className="w-3.5 h-3.5" />,
+      cls: "bg-white text-[#111111] border border-[#B90D12]/20 hover:bg-[#FFD21A]",
+      icon: <XSocialIcon className="w-3.5 h-3.5 text-[#111111]" />,
     },
   ];
 
@@ -309,44 +311,51 @@ export default function MenuQrModal({
   return createPortal(
     <div
       dir="rtl"
-      className="fixed inset-0 z-[95] flex items-end sm:items-center justify-center p-2.5 sm:p-4 animate-modal-backdrop"
+      className="fixed inset-0 z-[95] flex items-end sm:items-center justify-center p-2.5 sm:p-4 animate-modal-backdrop overscroll-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="menu-qr-modal-title"
     >
       <div
-        className="absolute inset-0 bg-[#111111]/70 backdrop-blur-xs"
+        className="absolute inset-0 bg-[#111111]/70 backdrop-blur-xs touch-none"
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-md rounded-3xl bg-[#FFF8E8] shadow-2xl border-2 border-[#B90D12]/30 overflow-hidden animate-modal-content max-h-[92dvh] flex flex-col">
-        {/* Top Sham Red Header */}
-        <div className="bg-gradient-to-l from-[#B90D12] via-[#A20B10] to-[#780508] text-white px-5 py-4 flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-10 h-10 rounded-2xl bg-[#FFD21A] text-[#111111] grid place-items-center shrink-0 shadow-sm">
-              <QrCodeIcon className="w-5 h-5" />
-            </span>
-            <div className="min-w-0 text-right">
-              <h3 id="menu-qr-modal-title" className="text-base sm:text-lg font-black truncate">
-                باركود ومشاركة منيو مأكولات الشام
-              </h3>
-              <p className="text-[11px] sm:text-xs text-[#FFF8E8]/85 font-semibold truncate">
-                امسح الرمز بالكاميرا أو شارك المنيو مع أصحابك وعيلتك
-              </p>
-            </div>
+      <div className="relative z-10 w-full max-w-md rounded-3xl bg-[#FFF8E8] shadow-2xl border-2 border-[#B90D12]/30 overflow-hidden animate-modal-content max-h-[90dvh] flex flex-col">
+        {/* Symmetrical 3-Column Header */}
+        <div
+          dir="ltr"
+          className="bg-gradient-to-l from-[#B90D12] via-[#A20B10] to-[#780508] text-white px-4 py-3.5 grid grid-cols-[40px_1fr_40px] items-center gap-2.5 shrink-0 border-b border-[#FFD21A]/25"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-emblem.webp"
+            alt="مأكولات الشام"
+            className="w-10 h-10 rounded-full object-contain drop-shadow-sm select-none"
+          />
+          <div dir="rtl" className="min-w-0 text-center">
+            <h3 id="menu-qr-modal-title" className="text-sm sm:text-base font-black truncate">
+              باركود منيو مأكولات الشام
+            </h3>
+            <p className="text-[11px] text-[#FFD21A] font-bold truncate">
+              امسح الرمز بالكاميرا أو شارك المنيو مباشرة
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="إغلاق"
-            className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white grid place-items-center shrink-0 cursor-pointer transition"
+            className="w-10 h-10 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#B90D12] grid place-items-center cursor-pointer transition"
           >
             <XIcon className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-4 sm:p-5 overflow-y-auto space-y-4">
+        {/* Scroll-Isolated Body (`data-modal-scroll`) */}
+        <div
+          data-modal-scroll
+          className="p-4 sm:p-5 overflow-y-auto overscroll-contain touch-pan-y space-y-4"
+        >
           <div className="mx-auto w-full max-w-[260px] rounded-3xl bg-white p-4 shadow-md border-2 border-[#B90D12]/20 text-center">
             <svg
               id="maakolatalsham-menu-qr-svg"
@@ -410,7 +419,7 @@ export default function MenuQrModal({
               onClick={handleCopy}
               className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition cursor-pointer ${
                 copied
-                  ? "bg-[#19B536] text-white"
+                  ? "bg-[#111111] text-[#FFD21A]"
                   : "bg-[#B90D12] hover:bg-[#780508] text-white"
               }`}
             >

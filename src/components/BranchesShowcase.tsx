@@ -1,7 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import type { Branch } from "@/lib/types";
-import { ClockIcon, ExternalLinkIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "./icons";
+import {
+  ChevronDownIcon,
+  ClockIcon,
+  ExternalLinkIcon,
+  PhoneIcon,
+  PinIcon,
+  WhatsAppIcon,
+} from "./icons";
 import { OrderFromBranchButton } from "./BranchButtons";
 
 const BADR_NEIGHBORHOODS = [
@@ -22,8 +30,11 @@ const DEFAULT_PHONES = [
 ];
 
 export default function BranchesShowcase({ branches }: { branches: Branch[] }) {
+  const [phonesOpen, setPhonesOpen] = useState(false);
+  const [zonesOpen, setZonesOpen] = useState(false);
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
       {branches.map((b) => {
         const allPhones = Array.from(
           new Set(
@@ -32,142 +43,207 @@ export default function BranchesShowcase({ branches }: { branches: Branch[] }) {
             )
           )
         );
+        const primaryPhone = allPhones[0] || "01023182006";
 
         return (
           <div
             key={b.id}
-            className="lg:col-span-7 rounded-[32px] bg-white p-6 sm:p-8 flex flex-col border border-[#B90D12]/20 shadow-[0_14px_34px_-16px_rgba(185,13,18,0.14)]"
+            className="lg:col-span-7 rounded-[28px] sm:rounded-[32px] bg-white p-5 sm:p-7 flex flex-col border border-[#B90D12]/18 shadow-[0_14px_34px_-16px_rgba(185,13,18,0.12)] min-w-0"
           >
-            <div className="flex items-start justify-between gap-3 flex-wrap">
-              <div>
-                <div className="text-xs font-extrabold tracking-widest uppercase text-[#B90D12] mb-1.5">
-                  <span dir="ltr" className="font-en">
-                    EAGLE MALL • BADR CITY
-                  </span>
-                </div>
-                <h3 className="font-black text-xl sm:text-2xl text-[#111111] leading-snug text-right">
-                  {b.name}
-                </h3>
-              </div>
-              <span className="shrink-0 text-xs font-black bg-[#FFD21A] text-[#111111] px-3.5 py-1.5 rounded-full">
+            {/* Symmetrical Top Row */}
+            <div className="flex items-center justify-between gap-2.5 flex-wrap">
+              <h3 className="font-black text-lg sm:text-2xl text-[#111111] leading-snug text-right">
+                {b.name}
+              </h3>
+              <span className="shrink-0 text-xs font-black bg-[#FFD21A] text-[#111111] px-3 py-1 rounded-full">
                 {b.city} • مفتوح الآن
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#111111]/80 mt-3.5 flex items-start gap-2 font-bold leading-relaxed text-right">
-              <PinIcon className="w-4 h-4 shrink-0 text-[#B90D12] mt-0.5" />
-              <span>{b.address}</span>
-            </p>
-            <p className="text-xs sm:text-sm text-[#111111]/70 mt-2 flex items-center gap-2 font-semibold text-right">
-              <ClockIcon className="w-4 h-4 shrink-0 text-[#B90D12]" />
-              <span>{b.hours}</span>
-            </p>
-
-            {/* All 5 Clickable Order Hotlines */}
-            <div className="mt-4 pt-4 border-t border-[#B90D12]/12">
-              <div className="text-xs font-black text-[#111111]/75 mb-2.5">
-                أرقام الطلبات والتوصيل السريع:
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2" dir="ltr">
-                {allPhones.map((ph, idx) => (
-                  <a
-                    key={ph}
-                    href={`tel:${ph}`}
-                    className={`inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-en font-extrabold border transition ${
-                      idx === 0
-                        ? "bg-[#B90D12] hover:bg-[#780508] text-white border-[#B90D12]"
-                        : "bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#111111] border-[#B90D12]/20"
-                    }`}
-                  >
-                    <PhoneIcon className="w-3.5 h-3.5 shrink-0" />
-                    <span>{ph}</span>
-                  </a>
-                ))}
-              </div>
+            <div className="mt-3 space-y-1.5 text-xs sm:text-sm">
+              <p className="text-[#111111]/80 flex items-start gap-2 font-bold leading-relaxed text-right">
+                <PinIcon className="w-4 h-4 shrink-0 text-[#B90D12] mt-0.5" />
+                <span>{b.address}</span>
+              </p>
+              <p className="text-[#111111]/68 flex items-center gap-2 font-semibold text-right">
+                <ClockIcon className="w-4 h-4 shrink-0 text-[#B90D12]" />
+                <span>{b.hours}</span>
+              </p>
             </div>
 
-            {/* Services Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+            {/* Collapsible Dropdown (`دروب منيو`) for All 5 Order Phone Numbers */}
+            <div className="mt-4 rounded-2xl bg-[#FFF8E8] border border-[#B90D12]/16 overflow-hidden">
+              <div className="p-2.5 sm:p-3 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPhonesOpen((v) => !v)}
+                  aria-expanded={phonesOpen}
+                  className="flex-1 flex items-center justify-between gap-1.5 text-xs sm:text-sm font-black text-[#111111] hover:text-[#B90D12] transition cursor-pointer text-right min-w-0"
+                >
+                  <span className="flex items-center gap-1.5 truncate">
+                    <PhoneIcon className="w-3.5 h-3.5 text-[#B90D12] shrink-0" />
+                    <span className="whitespace-nowrap">كل الأرقام (٥)</span>
+                  </span>
+                  <ChevronDownIcon
+                    className={`w-4 h-4 text-[#B90D12] shrink-0 transition-transform duration-200 ${
+                      phonesOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                <a
+                  href={`tel:${primaryPhone}`}
+                  dir="ltr"
+                  className="shrink-0 rounded-full bg-[#B90D12] hover:bg-[#780508] text-white px-3 py-1.5 text-xs font-en font-black inline-flex items-center gap-1 transition"
+                >
+                  <PhoneIcon className="w-3 h-3 shrink-0" />
+                  <span>{primaryPhone}</span>
+                </a>
+              </div>
+
+              {phonesOpen && (
+                <div
+                  className="px-3 pb-3 pt-2 border-t border-[#B90D12]/12 grid grid-cols-2 sm:grid-cols-3 gap-2"
+                  dir="ltr"
+                >
+                  {allPhones.map((ph, idx) => (
+                    <a
+                      key={ph}
+                      href={`tel:${ph}`}
+                      className={`inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-en font-extrabold border transition ${
+                        idx === 0
+                          ? "bg-[#B90D12] text-white border-[#B90D12]"
+                          : "bg-white hover:bg-[#FFD21A] text-[#111111] border-[#B90D12]/20"
+                      }`}
+                    >
+                      <PhoneIcon className="w-3 h-3 shrink-0" />
+                      <span>{ph}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Horizontal Swipeable Services Carousel Strip */}
+            <div className="mt-3.5 flex overflow-x-auto no-scrollbar items-center gap-2 pb-0.5">
               {b.services.map((s) => (
                 <span
                   key={s}
-                  className="text-[11px] font-extrabold bg-[#FFF8E8] px-2.5 py-1.5 rounded-full text-[#111111]/85 border border-[#B90D12]/15 text-center truncate"
+                  className="shrink-0 whitespace-nowrap text-[11px] font-extrabold bg-[#FFF8E8] px-3 py-1.5 rounded-full text-[#111111]/85 border border-[#B90D12]/15"
                 >
                   {s}
                 </span>
               ))}
             </div>
 
-            {/* Google Maps Dual Links + Order CTA */}
-            <div className="mt-auto pt-5 flex flex-wrap items-center gap-2.5">
+            {/* Symmetrical Strict-Theme Action Area */}
+            <div className="mt-auto pt-4 space-y-2 sm:space-y-0 sm:flex sm:items-center sm:gap-2">
               <OrderFromBranchButton
                 branchId={b.id}
-                className="btn btn-primary text-xs sm:text-sm py-3 px-5 flex-1"
+                className="btn btn-primary text-xs sm:text-sm py-2.5 px-5 w-full sm:w-auto sm:flex-1 whitespace-nowrap"
               />
-              <a
-                href={`https://wa.me/${b.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-11 h-11 shrink-0 rounded-full bg-[#25D366] text-white grid place-items-center hover:brightness-105 transition-all shadow-sm"
-                aria-label="واتساب الطلبات"
-                title="طلب عبر واتساب"
-              >
-                <WhatsAppIcon className="w-5 h-5" />
-              </a>
-              <a
-                href={b.mapUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full bg-[#FFD21A] hover:bg-[#F2A900] text-[#111111] px-4 py-2.5 text-xs font-black inline-flex items-center gap-1.5 transition"
-                title="الموقع على خرائط جوجل"
-              >
-                <PinIcon className="w-4 h-4 text-[#B90D12]" />
-                <span>خريطة إيجل مول</span>
-                <ExternalLinkIcon className="w-3.5 h-3.5" />
-              </a>
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                <a
+                  href={`https://wa.me/${b.whatsapp}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full bg-[#111111] hover:bg-[#B90D12] text-[#FFD21A] hover:text-white px-4 py-2.5 text-xs font-black inline-flex items-center justify-center gap-1.5 transition whitespace-nowrap"
+                  title="طلب عبر واتساب"
+                >
+                  <WhatsAppIcon className="w-4 h-4 shrink-0" />
+                  <span>واتساب</span>
+                </a>
+                <a
+                  href={b.mapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full bg-[#FFD21A] hover:bg-[#F2A900] text-[#111111] px-4 py-2.5 text-xs font-black inline-flex items-center justify-center gap-1.5 transition whitespace-nowrap"
+                  title="الموقع على خرائط جوجل"
+                >
+                  <PinIcon className="w-3.5 h-3.5 text-[#B90D12] shrink-0" />
+                  <span>خريطة المول</span>
+                  <ExternalLinkIcon className="w-3 h-3 shrink-0" />
+                </a>
+              </div>
             </div>
           </div>
         );
       })}
 
-      {/* Badr City Neighborhood Delivery Bento Card */}
-      <div className="lg:col-span-5 rounded-[32px] bg-gradient-to-b from-[#B90D12] to-[#780508] text-white p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden shadow-lg">
+      {/* Badr City Delivery Zones Card — Horizontal Swipeable Strip + Collapsible Dropdown (`دروب منيو`) */}
+      <div className="lg:col-span-5 rounded-[28px] sm:rounded-[32px] bg-gradient-to-b from-[#B90D12] to-[#780508] text-white p-5 sm:p-7 flex flex-col justify-between relative overflow-hidden shadow-lg min-w-0">
         <div
-          className="pointer-events-none absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-[#FFD21A]/20 blur-2xl"
+          className="pointer-events-none absolute -bottom-16 -left-16 w-52 h-52 rounded-full bg-[#FFD21A]/18 blur-2xl"
           aria-hidden="true"
         />
+
         <div className="relative z-10">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <span className="text-xs font-extrabold text-[#FFD21A]">
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            <span className="rounded-full bg-[#FFD21A] text-[#111111] px-3 py-0.5 text-[11px] font-black">
               نطاق التوصيل السريع
             </span>
-            <span dir="ltr" className="font-en text-xs text-white/70 tracking-widest">
-              DELIVERY ZONES
+            <span className="text-xs font-bold text-[#FFF8E8]/80">
+              {BADR_NEIGHBORHOODS.length} مناطق مخدومة
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-black text-white text-right">
+
+          <h3 className="text-lg sm:text-2xl font-black text-white text-right leading-snug">
             من إيجل مول لحد باب بيتك في مدينة بدر
           </h3>
           <p className="text-xs sm:text-sm text-[#FFF8E8]/85 mt-1.5 leading-relaxed text-right">
-            سندوتشات الشاورما عالصاج، الفراخ البروستد والمشوية، والفتة الشامية بتوصلك سخنة وطازة لكل أحياء ومجاورات مدينة بدر.
+            سندوتشات الشاورما عالصاج، الفراخ البروستد والمشوية، والفتة بتوصلك سخنة وطازة لكل أحياء ومجاورات مدينة بدر.
           </p>
 
-          <div className="mt-4 grid grid-cols-1 gap-2">
-            {BADR_NEIGHBORHOODS.map((zone, idx) => (
-              <div
-                key={zone}
-                className="rounded-2xl bg-black/20 border border-white/15 px-3.5 py-2.5 flex items-center justify-between gap-2"
-              >
-                <span className="text-xs font-extrabold text-white text-right">{zone}</span>
-                <span dir="ltr" className="font-en text-[11px] text-[#FFD21A] shrink-0">
-                  /0{idx + 1}
+          {/* Horizontal Swipeable Carousel Preview (Always Compact!) */}
+          {!zonesOpen && (
+            <div className="mt-3.5 flex overflow-x-auto no-scrollbar items-center gap-2 pb-1">
+              {BADR_NEIGHBORHOODS.map((zone) => (
+                <span
+                  key={zone}
+                  className="shrink-0 whitespace-nowrap rounded-full bg-black/25 border border-white/18 px-3.5 py-1.5 text-xs font-extrabold text-[#FFF8E8]"
+                >
+                  {zone}
                 </span>
+              ))}
+            </div>
+          )}
+
+          {/* Collapsible Dropdown (`دروب منيو`) for Full Delivery Zones List */}
+          <div className="mt-3 rounded-2xl bg-black/22 border border-white/18 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setZonesOpen((v) => !v)}
+              aria-expanded={zonesOpen}
+              className="w-full px-4 py-2.5 flex items-center justify-between text-xs font-black text-[#FFD21A] hover:text-white transition cursor-pointer"
+            >
+              <span>
+                {zonesOpen ? "إخفاء قائمة أحياء التوصيل" : "عرض كل أحياء ومناطق التوصيل"}
+              </span>
+              <ChevronDownIcon
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  zonesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {zonesOpen && (
+              <div className="px-3 pb-3 pt-1.5 border-t border-white/12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1.5">
+                {BADR_NEIGHBORHOODS.map((zone) => (
+                  <div
+                    key={zone}
+                    className="rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white flex items-center gap-2"
+                  >
+                    <PinIcon className="w-3.5 h-3.5 text-[#FFD21A] shrink-0" />
+                    <span>{zone}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
 
-        <div className="relative z-10 mt-5 pt-4 border-t border-white/15 flex items-center justify-between gap-3">
+        {/* Clean Symmetrical Bottom Strip */}
+        <div className="relative z-10 mt-4 pt-3.5 border-t border-white/15 flex items-center justify-between gap-3">
           <span className="text-xs font-bold text-white/90">
             واتساب الطلبات السريع:
           </span>
@@ -176,9 +252,9 @@ export default function BranchesShowcase({ branches }: { branches: Branch[] }) {
             target="_blank"
             rel="noreferrer"
             dir="ltr"
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#FFD21A] text-[#111111] px-4 py-1.5 text-xs font-en font-black hover:bg-white transition"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#FFD21A] hover:bg-white text-[#111111] px-4 py-1.5 text-xs font-en font-black transition shrink-0"
           >
-            <WhatsAppIcon className="w-3.5 h-3.5" />
+            <WhatsAppIcon className="w-3.5 h-3.5 text-[#B90D12]" />
             <span>01023182006</span>
           </a>
         </div>

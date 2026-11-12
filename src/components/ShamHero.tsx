@@ -105,85 +105,86 @@ export default function ShamHero() {
             const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
             touchStartX.current = null;
             if (Math.abs(dx) > 44) {
-              // RTL natural swipe
               setIdx((prev) =>
                 dx > 0 ? (prev + 1) % SLIDES.length : (prev - 1 + SLIDES.length) % SLIDES.length
               );
             }
           }}
-          className="relative rounded-[30px] sm:rounded-[40px] bg-[#B90D12] text-[#FFF8E8] overflow-hidden shadow-[0_24px_56px_-22px_rgba(185,13,18,0.58)]"
+          className="relative rounded-[30px] sm:rounded-[40px] bg-[#B90D12] text-[#FFF8E8] overflow-hidden shadow-[0_24px_56px_-22px_rgba(185,13,18,0.58)] h-[505px] sm:h-[560px] lg:h-[565px] xl:h-[595px]"
         >
-          {/* Subtle Warm Studio Glow in Center */}
+          {/* Subtle Warm Studio Glow */}
           <div
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_62%,rgba(229,57,53,0.34),transparent_62%)]"
             aria-hidden="true"
           />
 
           {/* =====================================================================
-              DESKTOP LAYOUT (`lg:grid`) — 90/10 Lafet Shamia Reference Composition
+              DESKTOP LAYOUT (`lg:grid`) — Strictly Locked Height (`h-full`)
              ===================================================================== */}
-          <div className="hidden lg:grid lg:grid-cols-12 items-center min-h-[560px] xl:min-h-[600px] px-10 xl:px-14 pt-8 relative z-10">
-            {/* Right Column (RTL Cols 1-5): Bold Cream Display Headline + Subtitle + CTAs */}
-            <div className="col-span-5 pb-12 text-right space-y-5 z-20">
-              <div className="inline-flex items-center gap-2 rounded-full bg-black/20 border border-[#FFD21A]/35 px-3.5 py-1 text-xs font-extrabold text-[#FFD21A]">
-                <span>شاورما وبروستد مأكولات الشام • مدينة بدر</span>
-              </div>
+          <div className="hidden lg:grid lg:grid-cols-12 items-center h-full px-10 xl:px-14 relative z-10 overflow-hidden">
+            {/* Right Column (RTL Cols 1-5): Fixed-position Headline + Subtitle + CTAs */}
+            <div className="col-span-5 text-right z-20 flex flex-col justify-center h-full py-10">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-black/20 border border-[#FFD21A]/35 px-3.5 py-1 text-xs font-extrabold text-[#FFD21A]">
+                  <span>شاورما وبروستد مأكولات الشام • مدينة بدر</span>
+                </div>
 
-              <h1 className="text-5xl xl:text-[64px] font-black leading-[1.08] tracking-tight text-[#FFF8E8]">
-                <span className="block">{slide.headlineTop}</span>
-                <span className="block text-[#FFD21A] mt-1">{slide.headlineBottom}</span>
-              </h1>
+                <h1 className="mt-4 text-[36px] xl:text-[44px] font-black leading-[1.12] tracking-tight text-[#FFF8E8]">
+                  <span className="block whitespace-nowrap">{slide.headlineTop}</span>
+                  <span className="block text-[#FFD21A] mt-1 whitespace-nowrap">{slide.headlineBottom}</span>
+                </h1>
 
-              <p className="text-base xl:text-lg font-bold text-[#FFF8E8]/90 leading-relaxed max-w-md">
-                {slide.subtitle}
-              </p>
+                <p className="mt-4 text-base xl:text-lg font-bold text-[#FFF8E8]/90 leading-relaxed max-w-md h-[56px] line-clamp-2">
+                  {slide.subtitle}
+                </p>
 
-              <div className="pt-1 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/menu"
-                  className="rounded-full bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#B90D12] hover:text-[#111111] px-7 py-3.5 text-sm font-black transition shadow-md"
-                >
-                  اطلب الآن من المنيو
-                </Link>
-                <button
-                  type="button"
-                  onClick={openQr}
-                  className="rounded-full bg-black/20 hover:bg-black/35 border border-[#FFF8E8]/25 text-[#FFF8E8] px-5 py-3.5 text-xs font-black inline-flex items-center gap-2 transition cursor-pointer"
-                >
-                  <QrCodeIcon className="w-4 h-4 text-[#FFD21A]" />
-                  <span>باركود المنيو QR</span>
-                </button>
-              </div>
-
-              {/* Slide Switcher Dots / Pills */}
-              <div className="pt-2 flex items-center gap-2">
-                {SLIDES.map((s, i) => (
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/menu"
+                    className="rounded-full bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#B90D12] hover:text-[#111111] px-7 py-3.5 text-sm font-black transition shadow-md"
+                  >
+                    اطلب الآن من المنيو
+                  </Link>
                   <button
-                    key={s.id}
                     type="button"
-                    onClick={() => setIdx(i)}
-                    className={`h-2.5 rounded-full transition-all cursor-pointer ${
-                      i === idx
-                        ? "w-9 bg-[#FFD21A]"
-                        : "w-2.5 bg-[#FFF8E8]/35 hover:bg-[#FFF8E8]/65"
-                    }`}
-                    aria-label={s.calloutTitle}
-                  />
-                ))}
+                    onClick={openQr}
+                    className="rounded-full bg-black/20 hover:bg-black/35 border border-[#FFF8E8]/25 text-[#FFF8E8] px-5 py-3.5 text-xs font-black inline-flex items-center gap-2 transition cursor-pointer"
+                  >
+                    <QrCodeIcon className="w-4 h-4 text-[#FFD21A]" />
+                    <span>باركود المنيو QR</span>
+                  </button>
+                </div>
+
+                {/* Slide Switcher Dots */}
+                <div className="mt-6 flex items-center gap-2">
+                  {SLIDES.map((s, i) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setIdx(i)}
+                      className={`h-2.5 rounded-full transition-all cursor-pointer ${
+                        i === idx
+                          ? "w-9 bg-[#FFD21A]"
+                          : "w-2.5 bg-[#FFF8E8]/35 hover:bg-[#FFF8E8]/65"
+                      }`}
+                      aria-label={s.calloutTitle}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Center Column (Cols 6-8): Hero Shawarma Hand / Platter Rising from Bottom */}
-            <div className="col-span-4 self-end flex items-end justify-center h-full relative z-10">
+            {/* Center Column (Cols 6-9): Fixed-Height Visual Stage */}
+            <div className="col-span-4 h-full flex items-end justify-center relative z-10 overflow-hidden">
               {slide.isHandCutout ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={slide.image}
                   alt={slide.productName}
-                  className="w-[390px] xl:w-[435px] max-w-none h-auto object-contain object-bottom block select-none translate-y-1 drop-shadow-[0_18px_28px_rgba(60,0,4,0.38)]"
+                  className="h-[510px] xl:h-[545px] w-auto object-contain object-bottom block select-none translate-y-1 drop-shadow-[0_18px_28px_rgba(60,0,4,0.38)]"
                 />
               ) : (
-                <div className="pb-10 pt-4 flex items-center justify-center">
+                <div className="h-full flex items-center justify-center">
                   <div className="w-[320px] h-[320px] xl:w-[350px] xl:h-[350px] rounded-[36px] bg-[#780508]/60 border-2 border-[#FFD21A]/35 p-4 shadow-2xl overflow-hidden flex items-center justify-center">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -196,10 +197,9 @@ export default function ShamHero() {
               )}
             </div>
 
-            {/* Left Column (RTL Cols 9-12): Curved Cream Arrow + Product Callout + Yellow Price Pill + `+` Circle + Tilted Sticker */}
-            <div className="col-span-3 pb-12 flex flex-col items-end justify-between h-full py-12 z-20">
-              <div className="mt-10 flex items-center gap-3.5" dir="ltr">
-                {/* Circular `+` Quick-Add Button */}
+            {/* Left Column (RTL Cols 10-12): Callout + Quick-Add + Sticker */}
+            <div className="col-span-3 flex flex-col items-end justify-between h-full py-12 z-20">
+              <div className="mt-8 flex items-center gap-3.5" dir="ltr">
                 <button
                   type="button"
                   onClick={handleQuickAdd}
@@ -218,7 +218,6 @@ export default function ShamHero() {
                   )}
                 </button>
 
-                {/* Product Label + Golden Yellow Price Pill */}
                 <div className="text-right" dir="rtl">
                   <div className="text-lg xl:text-xl font-black text-[#FFF8E8] whitespace-nowrap">
                     {slide.calloutTitle}
@@ -228,7 +227,6 @@ export default function ShamHero() {
                   </div>
                 </div>
 
-                {/* Hand-drawn Curved Cream Arrow pointing right toward the Shawarma Wrap */}
                 <svg
                   viewBox="0 0 84 54"
                   fill="none"
@@ -251,9 +249,8 @@ export default function ShamHero() {
                 </svg>
               </div>
 
-              {/* Tilted Golden-Yellow Sticker Badge (Bottom Left) */}
               <div className="mb-4 self-start ms-4">
-                <span className="inline-block rounded-full bg-[#FFD21A] text-[#111111] px-5 py-2 text-sm font-black shadow-md -rotate-8 select-none">
+                <span className="inline-block rounded-full bg-[#FFD21A] text-[#111111] px-5 py-2 text-sm font-black shadow-md -rotate-6 select-none whitespace-nowrap">
                   {slide.sticker}
                 </span>
               </div>
@@ -261,45 +258,47 @@ export default function ShamHero() {
           </div>
 
           {/* =====================================================================
-              MOBILE & TABLET LAYOUT (`lg:hidden`) — Exact Mobile Reference Rhythm
+              MOBILE & TABLET LAYOUT (`lg:hidden`) — Strictly Locked Height (`h-full`)
              ===================================================================== */}
-          <div className="lg:hidden relative z-10 px-5 pt-6 flex flex-col items-center text-center">
-            <span className="inline-flex items-center rounded-full bg-black/20 border border-[#FFD21A]/35 px-3 py-1 text-[11px] font-extrabold text-[#FFD21A]">
-              شاورما وبروستد مأكولات الشام • إيجل مول مدينة بدر
-            </span>
+          <div className="lg:hidden relative z-10 px-5 pt-5 h-full flex flex-col items-center justify-between text-center overflow-hidden">
+            {/* Fixed Top Copy & CTA Area */}
+            <div className="w-full flex flex-col items-center shrink-0">
+              <span className="inline-flex items-center rounded-full bg-black/20 border border-[#FFD21A]/35 px-3 py-1 text-[11px] font-extrabold text-[#FFD21A]">
+                شاورما وبروستد مأكولات الشام • إيجل مول مدينة بدر
+              </span>
 
-            <h1 className="mt-3 text-[34px] sm:text-5xl font-black leading-[1.08] tracking-tight text-[#FFF8E8]">
-              <span className="block">{slide.headlineTop}</span>
-              <span className="block text-[#FFD21A] mt-0.5">{slide.headlineBottom}</span>
-            </h1>
+              <h1 className="mt-2.5 text-[31px] sm:text-[44px] font-black leading-[1.08] tracking-tight text-[#FFF8E8] w-full">
+                <span className="block truncate">{slide.headlineTop}</span>
+                <span className="block text-[#FFD21A] mt-0.5 truncate">{slide.headlineBottom}</span>
+              </h1>
 
-            <p className="mt-2 text-xs sm:text-sm font-bold text-[#FFF8E8]/90 max-w-xs sm:max-w-md leading-relaxed">
-              {slide.subtitle}
-            </p>
+              <p className="mt-1.5 text-xs sm:text-sm font-bold text-[#FFF8E8]/90 max-w-xs sm:max-w-md leading-relaxed h-[38px] sm:h-[42px] line-clamp-2 flex items-center justify-center">
+                {slide.subtitle}
+              </p>
 
-            {/* Mobile CTA Row */}
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <Link
-                href="/menu"
-                className="rounded-full bg-[#FFF8E8] text-[#B90D12] px-5 py-2 text-xs font-black shadow-sm"
-              >
-                اطلب الآن من المنيو
-              </Link>
-              <button
-                type="button"
-                onClick={openQr}
-                className="rounded-full bg-black/20 border border-[#FFF8E8]/25 text-[#FFF8E8] px-3.5 py-2 text-xs font-black inline-flex items-center gap-1.5 cursor-pointer"
-              >
-                <QrCodeIcon className="w-3.5 h-3.5 text-[#FFD21A]" />
-                <span className="font-en">QR</span>
-              </button>
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <Link
+                  href="/menu"
+                  className="rounded-full bg-[#FFF8E8] text-[#B90D12] px-5 py-2 text-xs font-black shadow-sm"
+                >
+                  اطلب الآن من المنيو
+                </Link>
+                <button
+                  type="button"
+                  onClick={openQr}
+                  className="rounded-full bg-black/20 border border-[#FFF8E8]/25 text-[#FFF8E8] px-3.5 py-2 text-xs font-black inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <QrCodeIcon className="w-3.5 h-3.5 text-[#FFD21A]" />
+                  <span className="font-en">QR</span>
+                </button>
+              </div>
             </div>
 
-            {/* Bottom Visual Stage with Callout Right + Wrap Center + `+` Circle Left */}
-            <div className="relative w-full mt-3 min-h-[275px] sm:min-h-[330px] flex items-end justify-center">
+            {/* Fixed-Height Bottom Visual Stage (`h-[260px] sm:h-[295px]`) */}
+            <div className="relative w-full h-[260px] sm:h-[295px] shrink-0 flex items-end justify-center overflow-hidden">
               {/* Right Floating Callout + Yellow Price Pill */}
-              <div className="absolute right-0 top-12 sm:top-16 z-20 text-right">
-                <div className="text-xs sm:text-sm font-black text-[#FFF8E8]">
+              <div className="absolute right-0 top-9 sm:top-12 z-20 text-right max-w-[115px] sm:max-w-none">
+                <div className="text-xs sm:text-sm font-black text-[#FFF8E8] leading-tight">
                   {slide.calloutTitle}
                 </div>
                 <span className="mt-1 inline-flex items-center rounded-full bg-[#FFD21A] text-[#111111] px-2.5 py-0.5 text-[11px] sm:text-xs font-black shadow-xs">
@@ -308,7 +307,7 @@ export default function ShamHero() {
               </div>
 
               {/* Left Curved Cream Arrow + Circular `+` Button */}
-              <div className="absolute left-1 top-6 sm:top-10 z-20 flex flex-col items-center gap-3">
+              <div className="absolute left-1 top-5 sm:top-8 z-20 flex flex-col items-center gap-2.5">
                 <svg
                   viewBox="0 0 64 46"
                   fill="none"
@@ -354,11 +353,11 @@ export default function ShamHero() {
                 <img
                   src={slide.image}
                   alt={slide.productName}
-                  className="w-[235px] sm:w-[290px] h-auto object-contain object-bottom block select-none translate-y-1 drop-shadow-[0_14px_22px_rgba(60,0,4,0.38)]"
+                  className="h-[248px] sm:h-[285px] w-auto object-contain object-bottom block select-none translate-y-1 drop-shadow-[0_14px_22px_rgba(60,0,4,0.38)]"
                 />
               ) : (
-                <div className="pb-5 pt-2">
-                  <div className="w-[195px] h-[195px] sm:w-[235px] sm:h-[235px] rounded-[28px] bg-[#780508]/65 border-2 border-[#FFD21A]/35 p-2.5 shadow-xl overflow-hidden">
+                <div className="h-full flex items-center justify-center pb-3">
+                  <div className="w-[192px] h-[192px] sm:w-[228px] sm:h-[228px] rounded-[28px] bg-[#780508]/65 border-2 border-[#FFD21A]/35 p-2.5 shadow-xl overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={slide.image}

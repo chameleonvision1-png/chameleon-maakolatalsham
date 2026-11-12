@@ -2,22 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 import { useStore } from "./store";
 import { formatPrice } from "@/lib/format";
 import {
   CartIcon,
   CheckIcon,
-  ChevronIcon,
+  ChevronDownIcon,
   CloseIcon,
   DownloadAppIcon,
-  ExternalLinkIcon,
+  FacebookIcon,
+  FileTextIcon,
+  InstagramIcon,
+  LinkIcon,
+  MenuIcon,
   PhoneIcon,
+  PinIcon,
   QrCodeIcon,
   ShareIosIcon,
+  TikTokIcon,
+  UtensilsIcon,
   WhatsAppIcon,
-  XIcon,
 } from "./icons";
 import MenuQrModal from "./MenuQrModal";
 
@@ -32,25 +39,34 @@ declare global {
   }
 }
 
-const NAV_LINKS = [
-  { href: "/", labelAr: "الرئيسية", labelEn: "HOME" },
-  { href: "/offers", labelAr: "العروض", labelEn: "OFFERS" },
-  { href: "/occasions", labelAr: "عزومات مأكولات الشام", labelEn: "CATERING" },
-  { href: "/branches", labelAr: "فرع مدينة بدر", labelEn: "BADR CITY" },
-  { href: "/about", labelAr: "قصتنا", labelEn: "OUR STORY" },
-  { href: "/contact", labelAr: "تواصل معنا", labelEn: "CONTACT" },
+const TOP_NAV = [
+  { href: "/", label: "الرئيسية" },
+  { href: "/menu", label: "المنيو" },
+  { href: "/offers", label: "العروض" },
+  { href: "/occasions", label: "العزومات" },
+  { href: "/branches", label: "فرع بدر" },
+  { href: "/contact", label: "تواصل معنا" },
+];
+
+const SITE_PAGES = [
+  { href: "/", label: "الصفحة الرئيسية" },
+  { href: "/offers", label: "العروض والتوفير" },
+  { href: "/occasions", label: "عزومات مأكولات الشام" },
+  { href: "/branches", label: "فرع إيجل مول بدر" },
+  { href: "/about", label: "قصة مأكولات الشام" },
+  { href: "/contact", label: "تواصل معنا" },
 ];
 
 const QUICK_CATEGORIES = [
-  { href: "/menu?cat=shawarma_sandwiches", labelAr: "سندوتشات الشاورما", labelEn: "SHAWARMA WRAPS" },
-  { href: "/menu?cat=shawarma_meals", labelAr: "وجبات الشاورما والعربي", labelEn: "ARABI & MARIA" },
-  { href: "/menu?cat=broasted", labelAr: "الفراخ البروستد", labelEn: "BROASTED CHICKEN" },
-  { href: "/menu?cat=grilled", labelAr: "الفراخ المشوية", labelEn: "GRILLED CHICKEN" },
-  { href: "/menu?cat=fatteh", labelAr: "قسم الفتة والموتزاريلا", labelEn: "SYRIAN FATTEH" },
-  { href: "/menu?cat=western", labelAr: "سندوتشات ووجبات الغربي", labelEn: "CRISPY & WESTERN" },
-  { href: "/menu?cat=pizza", labelAr: "قسم البيتزا", labelEn: "FRESH PIZZA" },
-  { href: "/menu?cat=falafel_fries", labelAr: "الفلافل والبطاطس السوري", labelEn: "FALAFEL & FRIES" },
-  { href: "/menu?cat=sides_drinks", labelAr: "الإضافات والمشروبات", labelEn: "SIDES & DRINKS" },
+  { href: "/menu?cat=shawarma_sandwiches", label: "سندوتشات الشاورما" },
+  { href: "/menu?cat=shawarma_meals", label: "العربي والماريا" },
+  { href: "/menu?cat=broasted", label: "الفراخ البروستد" },
+  { href: "/menu?cat=grilled", label: "الفراخ المشوية" },
+  { href: "/menu?cat=fatteh", label: "الفتة والموتزاريلا" },
+  { href: "/menu?cat=western", label: "السندوتشات الغربي" },
+  { href: "/menu?cat=pizza", label: "البيتزا والفطائر" },
+  { href: "/menu?cat=falafel_fries", label: "الفلافل والبطاطس" },
+  { href: "/menu?cat=sides_drinks", label: "الثومية والمشروبات" },
 ];
 
 const ORDER_PHONES = [
@@ -61,80 +77,101 @@ const ORDER_PHONES = [
   "01114101253",
 ];
 
-export default function Header() {
-  const pathname = usePathname();
-  const { count, subtotal, bump, hydrated } = useStore();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [qrOpen, setQrOpen] = useState(false);
-  const [showInstallGuide, setShowInstallGuide] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<"pages" | "cats" | null>("cats");
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(() =>
-    typeof window !== "undefined" ? window.__pwaInstallPrompt ?? null : null
-  );
-  const [isStandalone, setIsStandalone] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return (
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as Navigator & { standalone?: boolean }).standalone === true
-    );
-  });
-  const [isIOS] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return (
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-    );
-  });
+const SOCIAL_ITEMS = [
+  {
+    label: "فيسبوك",
+    href: "https://www.facebook.com/profile.php?id=100064128211128",
+    icon: FacebookIcon,
+  },
+  {
+    label: "إنستجرام",
+    href: "https://www.instagram.com/Maakolat_AlshamEG",
+    icon: InstagramIcon,
+  },
+  {
+    label: "تيك توك",
+    href: "https://www.tiktok.com/@maakolat_alsham",
+    icon: TikTokIcon,
+  },
+  {
+    label: "Linktree",
+    href: "https://linktr.ee/MaakolatAlsham",
+    icon: LinkIcon,
+  },
+];
 
-  const savedScrollYRef = useRef(0);
-  const lastPathnameRef = useRef(pathname);
+export default function Header() {
+  const { count, subtotal, bump, hydrated, openPicker } = useStore();
+  const pathname = usePathname();
+  const isMenuPage = pathname?.startsWith("/menu") ?? false;
+
+  const [drawerOpenPath, setDrawerOpenPath] = useState<string | null>(null);
+  const drawerOpen = drawerOpenPath !== null && drawerOpenPath === pathname;
+  const openDrawer = () => setDrawerOpenPath(pathname || "/");
+  const closeDrawer = () => setDrawerOpenPath(null);
+
+  const [qrOpen, setQrOpen] = useState(false);
+  const [openSection, setOpenSection] = useState<"cats" | "pages" | "phones" | null>("cats");
+
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installedNow, setInstalledNow] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
+
+  const isStandalone =
+    installedNow ||
+    (hydrated &&
+      typeof window !== "undefined" &&
+      (window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as Navigator & { standalone?: boolean }).standalone === true));
+
+  const isIosDevice =
+    hydrated &&
+    typeof window !== "undefined" &&
+    (/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()) ||
+      (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1));
 
   useEffect(() => {
-    const onOpenQr = () => setQrOpen(true);
-    const onOpenDrawer = () => setDrawerOpen(true);
-    window.addEventListener("open-menu-qr", onOpenQr);
-    window.addEventListener("open-mobile-drawer", onOpenDrawer);
-    return () => {
-      window.removeEventListener("open-menu-qr", onOpenQr);
-      window.removeEventListener("open-mobile-drawer", onOpenDrawer);
-    };
+    const openQrListener = () => setQrOpen(true);
+    window.addEventListener("open-menu-qr", openQrListener);
+    return () => window.removeEventListener("open-menu-qr", openQrListener);
   }, []);
 
+  useLockBodyScroll(drawerOpen || showInstallGuide);
+
   useEffect(() => {
-    const onBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      const promptEvent = e as BeforeInstallPromptEvent;
-      window.__pwaInstallPrompt = promptEvent;
-      setDeferredPrompt(promptEvent);
-    };
-    const onPromptAvailable = () => {
-      if (window.__pwaInstallPrompt) {
-        setDeferredPrompt(window.__pwaInstallPrompt);
+    if (!drawerOpen && !showInstallGuide) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDrawerOpenPath(null);
+        setShowInstallGuide(false);
       }
     };
-    const onInstalled = () => {
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drawerOpen, showInstallGuide]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      const evt = e as BeforeInstallPromptEvent;
+      window.__pwaInstallPrompt = evt;
+      setDeferredPrompt(evt);
+    };
+
+    const handleInstalled = () => {
       window.__pwaInstallPrompt = null;
       setDeferredPrompt(null);
-      setIsStandalone(true);
+      setInstalledNow(true);
       setShowInstallGuide(false);
     };
-    const mql = window.matchMedia("(display-mode: standalone)");
-    const onDisplayModeChange = (e: MediaQueryListEvent) => {
-      setIsStandalone(e.matches);
-    };
 
-    window.addEventListener("beforeinstallprompt", onBeforeInstall);
-    window.addEventListener("pwa-install-available", onPromptAvailable);
-    window.addEventListener("appinstalled", onInstalled);
-    window.addEventListener("pwa-app-installed", onInstalled);
-    mql.addEventListener("change", onDisplayModeChange);
-
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
+    window.addEventListener("appinstalled", handleInstalled);
     return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
-      window.removeEventListener("pwa-install-available", onPromptAvailable);
-      window.removeEventListener("appinstalled", onInstalled);
-      window.removeEventListener("pwa-app-installed", onInstalled);
-      mql.removeEventListener("change", onDisplayModeChange);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      window.removeEventListener("appinstalled", handleInstalled);
     };
   }, []);
 
@@ -147,575 +184,447 @@ export default function Header() {
         if (choice.outcome === "accepted") {
           window.__pwaInstallPrompt = null;
           setDeferredPrompt(null);
-          setDrawerOpen(false);
         }
+        return;
       } catch {
-        setDrawerOpen(false);
-        setShowInstallGuide(true);
+        // Fallback to manual install guide
       }
-      return;
     }
-    setDrawerOpen(false);
+    closeDrawer();
     setShowInstallGuide(true);
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDrawerOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-
-    if (drawerOpen) {
-      savedScrollYRef.current = window.scrollY;
-      lastPathnameRef.current = pathname;
-
-      html.style.overflow = "hidden";
-      html.style.overscrollBehavior = "none";
-      body.style.overflow = "hidden";
-      body.style.overscrollBehavior = "none";
-      body.style.position = "fixed";
-      body.style.top = `-${savedScrollYRef.current}px`;
-      body.style.left = "0";
-      body.style.right = "0";
-      body.style.width = "100%";
-    } else {
-      const wasLocked = body.style.position === "fixed";
-      const targetScrollY = savedScrollYRef.current;
-      const sameRoute = lastPathnameRef.current === pathname;
-
-      html.style.overflow = "";
-      html.style.overscrollBehavior = "";
-      body.style.overflow = "";
-      body.style.overscrollBehavior = "";
-      body.style.position = "";
-      body.style.top = "";
-      body.style.left = "";
-      body.style.right = "";
-      body.style.width = "";
-
-      if (wasLocked && sameRoute) {
-        window.scrollTo(0, targetScrollY);
-      }
-    }
-
-    return () => {
-      html.style.overflow = "";
-      html.style.overscrollBehavior = "";
-      body.style.overflow = "";
-      body.style.overscrollBehavior = "";
-      body.style.position = "";
-      body.style.top = "";
-      body.style.left = "";
-      body.style.right = "";
-      body.style.width = "";
-    };
-  }, [drawerOpen, pathname]);
+  const toggleSection = (sec: "cats" | "pages" | "phones") => {
+    setOpenSection((prev) => (prev === sec ? null : sec));
+  };
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#FFF8E8]/95 backdrop-blur-md border-b border-[#111111]/[0.08]">
+      {/* =========================================================================
+          TOP STICKY BAR:
+          - Left (شمال): Icon ONLY on all pages; Horizontal Logo ONLY on `/menu`
+          - Center (Desktop): Clean Navigation Links
+          - Right (يمين): Cart Pill + Menu Burger Button (≡) ALWAYS Right
+         ========================================================================= */}
+      <header className="sticky top-0 z-50 bg-[#FFF8E8]/95 backdrop-blur-md border-b border-[#B90D12]/12">
         <div
           dir="ltr"
-          className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 h-14 lg:h-16 flex items-center justify-between gap-3"
+          className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 h-[64px] sm:h-[72px] flex items-center justify-between gap-3"
         >
-          {/* FAR LEFT (شمال دائماً): Simple Crest on Mobile + Horizontal Logo on Desktop */}
+          {/* LEFT (شمال): Horizontal Logo on `/menu`, Simple Crest Icon ONLY everywhere else */}
           <Link
             href="/"
-            dir="ltr"
-            className="flex items-center gap-2 shrink-0 group focus:outline-none"
+            aria-label="شاورما وبروستد مأكولات الشام — الصفحة الرئيسية"
+            className="flex items-center shrink-0 group focus:outline-none"
           >
-            {/* Mobile Dedicated Simple Crest Logo (`logo-mobile.webp`) */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-mobile.webp"
-              alt="شاورما وبروستد مأكولات الشام"
-              className="sm:hidden h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
-            />
-            <div className="sm:hidden flex flex-col text-right leading-none" dir="rtl">
-              <span className="text-xs font-black text-[#B90D12]">مأكولات الشام</span>
-              <span className="text-[10px] font-bold text-[#111111]/65 mt-0.5">
-                شاورما وبروستد • مدينة بدر
-              </span>
-            </div>
-
-            {/* Desktop Wide Horizontal Logo (`logo-horizontal.webp`) */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-horizontal.webp"
-              alt="شاورما وبروستد مأكولات الشام"
-              className="hidden sm:block h-10 lg:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
-            />
+            {isMenuPage ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src="/logo-horizontal.webp"
+                alt="شاورما وبروستد مأكولات الشام"
+                className="h-10 sm:h-11 md:h-12 w-auto max-w-[215px] sm:max-w-[260px] object-contain select-none transition-transform duration-200 group-hover:scale-[1.02]"
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src="/logo-mobile.webp"
+                alt="شاورما وبروستد مأكولات الشام"
+                className="h-12 sm:h-13 w-auto object-contain select-none transition-transform duration-200 group-hover:scale-105"
+              />
+            )}
           </Link>
 
-          {/* CENTER DESKTOP NAVIGATION */}
-          <nav dir="rtl" className="hidden lg:flex items-center gap-1 xl:gap-1.5">
-            {NAV_LINKS.map((item) => {
+          {/* CENTER (Desktop Only): Symmetrical Minimal Nav */}
+          <nav
+            dir="rtl"
+            aria-label="التنقل الرئيسي"
+            className="hidden lg:flex items-center justify-center gap-1 bg-white/85 border border-[#B90D12]/12 rounded-full px-2 py-1 shadow-2xs"
+          >
+            {TOP_NAV.map((item) => {
               const active =
-                item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname === item.href || pathname?.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors whitespace-nowrap ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-black transition ${
                     active
-                      ? "bg-[#B90D12] text-white"
-                      : "text-[#111111]/80 hover:text-[#B90D12] hover:bg-[#B90D12]/[0.07]"
+                      ? "bg-[#B90D12] text-white shadow-2xs"
+                      : "text-[#111111]/80 hover:text-[#B90D12] hover:bg-[#FFF8E8]"
                   }`}
                 >
-                  {item.labelAr}
+                  {item.label}
                 </Link>
               );
             })}
-
-            {/* Cohesive Split Menu + QR Pill */}
-            <div
-              className={`ms-1 inline-flex items-center rounded-full border p-0.5 transition-all ${
-                pathname.startsWith("/menu")
-                  ? "bg-[#B90D12] text-white border-[#B90D12]"
-                  : "bg-white text-[#B90D12] border-[#B90D12]/25 hover:border-[#B90D12]/60"
-              }`}
-            >
-              <Link
-                href="/menu"
-                className={`ps-3.5 pe-2.5 py-1 rounded-s-full font-extrabold text-xs flex items-center gap-1.5 transition whitespace-nowrap ${
-                  pathname.startsWith("/menu")
-                    ? "text-white hover:bg-white/10"
-                    : "text-[#B90D12] hover:bg-[#FFF8E8]"
-                }`}
-              >
-                <span>منيو مأكولات الشام</span>
-              </Link>
-              <span
-                className={`w-px h-3.5 ${
-                  pathname.startsWith("/menu") ? "bg-white/25" : "bg-[#B90D12]/20"
-                }`}
-                aria-hidden="true"
-              />
-              <button
-                type="button"
-                onClick={() => setQrOpen(true)}
-                title="باركود ومشاركة منيو مأكولات الشام (QR)"
-                aria-label="باركود ومشاركة منيو مأكولات الشام"
-                className={`ps-2.5 pe-3 py-1 rounded-e-full flex items-center gap-1 text-[11px] font-black transition active:scale-95 cursor-pointer ${
-                  pathname.startsWith("/menu")
-                    ? "text-[#FFD21A] hover:bg-white/15"
-                    : "text-[#111111] hover:text-[#B90D12] hover:bg-[#FFF8E8]"
-                }`}
-              >
-                <QrCodeIcon className="w-3.5 h-3.5 text-[#B90D12]" />
-                <span className="font-en tracking-wider">QR</span>
-              </button>
-            </div>
           </nav>
 
-          {/* FAR RIGHT (يمين دائماً): Desktop Cart/Order Pill + Menu Burger Button ALWAYS at Far Right */}
-          <div className="flex items-center gap-2 shrink-0" dir="ltr">
+          {/* RIGHT (يمين): Cart Pill + Menu Burger Button ALWAYS on Far Right */}
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/cart"
-              key={bump}
-              className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[#B90D12] hover:bg-[#780508] text-white pl-3.5 pr-1.5 py-1.5 text-xs font-extrabold transition-colors shadow-xs"
+              dir="rtl"
+              aria-label="سلة الطلبات"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full bg-white hover:bg-[#FFD21A]/25 border border-[#B90D12]/20 px-3.5 py-2 text-xs font-black text-[#111111] transition shadow-2xs"
             >
-              <span dir="rtl" className="font-black">
-                {hydrated && count > 0 ? `${count} صنف • ${formatPrice(subtotal)}` : "اطلب الآن"}
+              <span className="relative">
+                <CartIcon className="w-4 h-4 text-[#B90D12]" />
+                {hydrated && count > 0 && (
+                  <span
+                    key={bump}
+                    className="animate-pop absolute -top-2 -right-2 min-w-4 h-4 px-1 rounded-full bg-[#B90D12] text-white text-[10px] font-black grid place-items-center"
+                  >
+                    {count}
+                  </span>
+                )}
               </span>
-              <span className="w-6 h-6 rounded-full bg-[#FFD21A] text-[#111111] grid place-items-center text-[11px] font-black">
-                {hydrated && count > 0 ? count : <CartIcon className="w-3.5 h-3.5" />}
-              </span>
+              {hydrated && count > 0 ? (
+                <span className="tabular-nums text-[#B90D12]">{formatPrice(subtotal)}</span>
+              ) : (
+                <span>السلة</span>
+              )}
             </Link>
 
-            {/* Menu Burger Button (`≡`) — ALWAYS on the Far Right (أقصى اليمين) on Mobile & Desktop */}
             <button
               type="button"
-              onClick={() => setDrawerOpen(true)}
+              onClick={openDrawer}
               aria-label="فتح القائمة الجانبية"
               aria-expanded={drawerOpen}
-              className="w-10 h-10 rounded-full bg-[#B90D12] sm:bg-white border border-[#B90D12]/25 text-white sm:text-[#111111] hover:bg-[#780508] hover:text-white grid place-items-center transition active:scale-95 cursor-pointer shadow-2xs"
+              className="w-11 h-11 rounded-full bg-[#B90D12] hover:bg-[#780508] text-white grid place-items-center shadow-[0_8px_20px_-6px_rgba(185,13,18,0.5)] transition active:scale-95 cursor-pointer"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-5 h-5">
-                <line x1="4" y1="8" x2="20" y2="8" strokeLinecap="round" />
-                <line x1="4" y1="13" x2="20" y2="13" strokeLinecap="round" />
-                <line x1="8" y1="18" x2="20" y2="18" strokeLinecap="round" />
-              </svg>
+              <MenuIcon className="w-5 h-5" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Full Sidebar Drawer — Portal to document.body (Available on Mobile & Desktop) */}
+      {/* =========================================================================
+          MODERN SYMMETRICAL SIDEBAR DRAWER (`الشريط الجانبي`)
+          Opens from Right (`يمين`), Crisp Icons, Collapsible Dropdowns, Strict Theme
+         ========================================================================= */}
       {drawerOpen &&
         typeof document !== "undefined" &&
         createPortal(
           <div
-            dir="ltr"
+            className="fixed inset-0 z-[90] flex justify-end overscroll-none"
             role="dialog"
             aria-modal="true"
-            aria-label="القائمة الجانبية لمطعم مأكولات الشام"
-            className="fixed inset-0 z-[80] overflow-hidden overscroll-none"
+            aria-label="القائمة الجانبية — شاورما وبروستد مأكولات الشام"
           >
-            {/* Full-viewport Backdrop */}
+            {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-[#111111]/60 backdrop-blur-xs touch-none"
-              onClick={() => setDrawerOpen(false)}
+              className="absolute inset-0 bg-[#111111]/60 backdrop-blur-xs transition-opacity touch-none"
+              onClick={closeDrawer}
             />
 
-            {/* Right-aligned Sidebar Panel */}
+            {/* Drawer Panel */}
             <aside
               dir="rtl"
-              className="fixed top-0 bottom-0 right-0 z-10 w-[88vw] max-w-[390px] h-[100dvh] max-h-[100dvh] bg-[#FFF8E8] text-[#111111] shadow-2xl border-l border-[#B90D12]/20 flex flex-col overflow-hidden overscroll-contain"
+              className="relative z-10 w-full max-w-[380px] h-full bg-[#FFF8E8] text-[#111111] shadow-2xl border-s-2 border-[#B90D12]/20 flex flex-col overflow-hidden"
             >
-              {/* 1. Pinned Top Drawer Header */}
-              <div className="shrink-0 p-4 pb-3 border-b border-[#111111]/10 bg-white space-y-2.5">
-                <div className="flex items-center justify-between" dir="ltr">
+              {/* 1. Symmetrical Top Brand Bar (Logo Left شمال, Close Right يمين) */}
+              <div
+                dir="ltr"
+                className="shrink-0 bg-gradient-to-l from-[#B90D12] to-[#780508] text-white px-4 py-3.5 flex items-center justify-between gap-3 border-b border-[#FFD21A]/25"
+              >
+                <Link
+                  href="/"
+                  onClick={closeDrawer}
+                  className="shrink-0"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/logo-horizontal.webp"
                     alt="شاورما وبروستد مأكولات الشام"
-                    className="h-9 w-auto object-contain"
+                    className="h-10 w-auto max-w-[220px] object-contain"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setDrawerOpen(false)}
-                    aria-label="إغلاق القائمة"
-                    className="w-9 h-9 rounded-full bg-[#111111]/6 hover:bg-[#B90D12] text-[#111111] hover:text-white grid place-items-center transition cursor-pointer"
-                  >
-                    <CloseIcon className="w-4 h-4" />
-                  </button>
-                </div>
+                </Link>
 
-                {/* Status & Eagle Mall Badr City Banner */}
-                <div className="rounded-2xl bg-[#B90D12] text-white p-3.5 space-y-2.5 shadow-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <div className="text-xs font-black">مأكولات الشام — مدينة بدر</div>
-                      <div className="text-[11px] text-[#FFF8E8]/90 font-semibold mt-0.5">
-                        ميدان النسر • إيجل مول • بجوار البنك الأهلي
-                      </div>
-                    </div>
-                    <span className="text-[11px] bg-[#FFD21A] text-[#111111] px-2.5 py-1 rounded-full font-black shrink-0">
-                      مفتوح الآن
-                    </span>
-                  </div>
-
-                  {/* Quick Menu + QR Pill Row */}
-                  <div className="flex items-center gap-2 pt-0.5">
-                    <Link
-                      href="/menu"
-                      onClick={() => setDrawerOpen(false)}
-                      className="flex-1 rounded-full bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#B90D12] hover:text-[#111111] font-black text-xs py-2 px-3.5 text-center transition"
-                    >
-                      تصفح المنيو الكامل
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDrawerOpen(false);
-                        setQrOpen(true);
-                      }}
-                      className="shrink-0 rounded-full bg-[#FFD21A] hover:bg-white text-[#111111] font-black text-xs py-2 px-3.5 flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
-                    >
-                      <QrCodeIcon className="w-3.5 h-3.5 shrink-0" />
-                      <span>QR المنيو</span>
-                    </button>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={closeDrawer}
+                  aria-label="إغلاق القائمة"
+                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#B90D12] grid place-items-center transition cursor-pointer shrink-0"
+                >
+                  <CloseIcon className="w-4 h-4" />
+                </button>
               </div>
 
-              {/* 2. Scrollable Middle Content */}
-              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-2.5">
-                {/* Accordion 1: 9 Official Menu Categories */}
-                <div className="rounded-2xl border border-[#B90D12]/18 overflow-hidden bg-white">
-                  <div className="w-full px-3.5 py-2.5 bg-white flex items-center justify-between gap-2 border-b border-[#111111]/[0.06]">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOpenAccordion(openAccordion === "cats" ? null : "cats")
-                      }
-                      className="flex-1 flex items-center justify-between text-sm font-black text-[#111111] cursor-pointer"
-                    >
-                      <span>أقسام منيو مأكولات الشام (٩ أقسام)</span>
-                      <span className="font-en text-sm text-[#B90D12] px-1">
-                        {openAccordion === "cats" ? "−" : "+"}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDrawerOpen(false);
-                        setQrOpen(true);
-                      }}
-                      aria-label="باركود المنيو QR"
-                      title="باركود المنيو (QR)"
-                      className="shrink-0 h-7 px-2.5 rounded-lg bg-[#FFD21A] hover:brightness-105 text-[#111111] flex items-center gap-1 font-black text-[11px] transition active:scale-95 cursor-pointer"
-                    >
-                      <QrCodeIcon className="w-3.5 h-3.5 shrink-0" />
-                      <span className="font-en">QR</span>
-                    </button>
-                  </div>
-                  {openAccordion === "cats" && (
-                    <div className="divide-y divide-[#111111]/[0.06] bg-white">
-                      {QUICK_CATEGORIES.map((cat) => (
-                        <Link
-                          key={cat.href}
-                          href={cat.href}
-                          onClick={() => setDrawerOpen(false)}
-                          className="flex items-center justify-between px-4 py-2.5 text-xs font-extrabold hover:bg-[#FFF8E8] transition-colors"
-                        >
-                          <span className="text-right text-[#111111]">{cat.labelAr}</span>
-                          <span className="font-en text-[10px] font-bold text-[#B90D12] text-left">
-                            {cat.labelEn}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              {/* 2. Scrollable Structured Body */}
+              <div
+                data-modal-scroll
+                className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-4 space-y-3 no-scrollbar"
+              >
+                {/* Compact Symmetrical Branch Bar */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeDrawer();
+                    openPicker();
+                  }}
+                  className="w-full rounded-2xl bg-white border border-[#B90D12]/18 px-3.5 py-2.5 flex items-center justify-between gap-2 hover:border-[#B90D12] transition cursor-pointer shadow-2xs"
+                >
+                  <span className="flex items-center gap-2 text-xs font-black text-[#111111] truncate">
+                    <PinIcon className="w-4 h-4 text-[#B90D12] shrink-0" />
+                    <span className="truncate">مدينة بدر • إيجل مول</span>
+                  </span>
+                  <span className="shrink-0 rounded-full bg-[#FFD21A] text-[#111111] px-2.5 py-0.5 text-[11px] font-black">
+                    مفتوح الآن
+                  </span>
+                </button>
 
-                {/* Accordion 2: Site Pages */}
-                <div className="rounded-2xl border border-[#111111]/10 overflow-hidden bg-white">
+                {/* Symmetrical 2x2 Quick Action Bento */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/menu"
+                    onClick={closeDrawer}
+                    className="rounded-2xl bg-[#B90D12] hover:bg-[#780508] text-white p-3 flex flex-col items-center justify-center gap-1.5 text-center transition shadow-xs"
+                  >
+                    <UtensilsIcon className="w-5 h-5 text-[#FFD21A]" />
+                    <span className="text-xs font-black">المنيو التفاعلي</span>
+                  </Link>
+
                   <button
                     type="button"
-                    onClick={() =>
-                      setOpenAccordion(openAccordion === "pages" ? null : "pages")
-                    }
-                    className="w-full px-4 py-2.5 bg-white flex items-center justify-between text-sm font-black text-[#111111] cursor-pointer"
+                    onClick={() => {
+                      closeDrawer();
+                      setQrOpen(true);
+                    }}
+                    className="rounded-2xl bg-[#FFD21A] hover:bg-[#F2A900] text-[#111111] p-3 flex flex-col items-center justify-center gap-1.5 text-center transition shadow-xs cursor-pointer"
                   >
-                    <span>صفحات مأكولات الشام</span>
-                    <span className="font-en text-sm text-[#B90D12]">
-                      {openAccordion === "pages" ? "−" : "+"}
-                    </span>
+                    <QrCodeIcon className="w-5 h-5 text-[#B90D12]" />
+                    <span className="text-xs font-black">باركود QR</span>
                   </button>
-                  {openAccordion === "pages" && (
-                    <div className="divide-y divide-[#111111]/[0.06] bg-white border-t border-[#111111]/[0.06]">
-                      {NAV_LINKS.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setDrawerOpen(false)}
-                          className="flex items-center justify-between px-4 py-2.5 text-xs font-extrabold hover:bg-[#FFF8E8] transition-colors"
-                        >
-                          <span className="text-right text-[#111111]">{item.labelAr}</span>
-                          <span className="font-en text-[10px] font-bold text-[#111111]/45 text-left">
-                            {item.labelEn}
-                          </span>
-                        </Link>
-                      ))}
-
-                      <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#FFF8E8]">
-                        <Link
-                          href="/menu"
-                          onClick={() => setDrawerOpen(false)}
-                          className="flex-1 px-2 py-1.5 rounded-xl text-xs font-black text-[#B90D12] hover:bg-[#B90D12]/10 flex items-center justify-between transition"
-                        >
-                          <span>منيو مأكولات الشام الكامل</span>
-                          <span className="font-en text-[10px] text-[#B90D12]/80">MENU</span>
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDrawerOpen(false);
-                            setQrOpen(true);
-                          }}
-                          aria-label="باركود منيو مأكولات الشام QR"
-                          className="shrink-0 h-8 px-3 rounded-xl bg-[#B90D12] hover:bg-[#780508] text-white flex items-center justify-center gap-1.5 font-extrabold text-xs transition active:scale-95 cursor-pointer"
-                        >
-                          <QrCodeIcon className="w-3.5 h-3.5 text-[#FFD21A] shrink-0" />
-                          <span className="font-en">QR</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Cart + Official PDF Menu + Install Web App */}
-                <div className="pt-0.5 space-y-2">
-                  <Link
-                    href="/cart"
-                    onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-2xl font-extrabold text-xs sm:text-sm border transition ${
-                      pathname === "/cart"
-                        ? "bg-[#B90D12] text-white border-[#B90D12]"
-                        : "bg-white text-[#B90D12] border-[#B90D12]/25 hover:border-[#B90D12]"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2 truncate">
-                      <CartIcon className="w-4 h-4 shrink-0" />
-                      <span className="truncate font-black">سلة طلبات مأكولات الشام</span>
-                    </span>
-
-                    <span className="flex items-center gap-1.5 shrink-0">
-                      {hydrated && count > 0 ? (
-                        <span
-                          key={bump}
-                          className="animate-pop px-2.5 py-0.5 rounded-full text-[11px] font-black bg-[#FFD21A] text-[#111111]"
-                        >
-                          {count} • {formatPrice(subtotal)}
-                        </span>
-                      ) : (
-                        <span className="text-[11px] font-bold text-[#111111]/60">
-                          عرض السلة
-                        </span>
-                      )}
-                      <ChevronIcon className="w-4 h-4 shrink-0" />
-                    </span>
-                  </Link>
 
                   <a
                     href="/menu/maakolat-alsham-menu.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-2xl font-extrabold text-xs sm:text-sm text-[#111111] bg-white hover:bg-[#FFD21A] border border-[#111111]/12 transition"
+                    className="rounded-2xl bg-white hover:bg-[#FFF8E8] text-[#111111] border border-[#B90D12]/18 p-3 flex flex-col items-center justify-center gap-1.5 text-center transition"
                   >
-                    <span className="font-black">منيو مأكولات الشام الرسمي (PDF)</span>
-                    <ExternalLinkIcon className="w-4 h-4 text-[#B90D12] shrink-0" />
+                    <FileTextIcon className="w-5 h-5 text-[#B90D12]" />
+                    <span className="text-xs font-black">منيو PDF</span>
                   </a>
 
-                  {!isStandalone && (
-                    <button
-                      type="button"
-                      onClick={handleInstallClick}
-                      className="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-2xl font-extrabold text-xs sm:text-sm text-[#B90D12] bg-white hover:bg-[#B90D12] hover:text-white border border-[#B90D12]/25 transition cursor-pointer"
-                    >
-                      <span className="flex items-center gap-2 truncate">
-                        <DownloadAppIcon className="w-4 h-4 shrink-0" />
-                        <span className="truncate font-black">
-                          تنزيل تطبيق مأكولات الشام (Web App)
-                        </span>
-                      </span>
-                      <ChevronIcon className="w-4 h-4 shrink-0 opacity-75" />
-                    </button>
+                  <Link
+                    href="/cart"
+                    onClick={closeDrawer}
+                    className="rounded-2xl bg-white hover:bg-[#FFF8E8] text-[#111111] border border-[#B90D12]/18 p-3 flex flex-col items-center justify-center gap-1.5 text-center transition relative"
+                  >
+                    <CartIcon className="w-5 h-5 text-[#B90D12]" />
+                    <span className="text-xs font-black">
+                      {hydrated && count > 0 ? `السلة (${count})` : "سلة الطلبات"}
+                    </span>
+                  </Link>
+                </div>
+
+                {/* DROPDOWN 1: أقسام المنيو (٩ أقسام) */}
+                <div className="rounded-2xl bg-white border border-[#B90D12]/16 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("cats")}
+                    aria-expanded={openSection === "cats"}
+                    className="w-full px-4 py-3 flex items-center justify-between text-xs sm:text-sm font-black text-[#111111] hover:text-[#B90D12] transition cursor-pointer"
+                  >
+                    <span>أقسام المنيو (٩ أقسام)</span>
+                    <ChevronDownIcon
+                      className={`w-4 h-4 text-[#B90D12] transition-transform duration-200 ${
+                        openSection === "cats" ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {openSection === "cats" && (
+                    <div className="px-3 pb-3 pt-1 border-t border-[#B90D12]/10 grid grid-cols-2 gap-1.5">
+                      {QUICK_CATEGORIES.map((cat, idx) => (
+                        <Link
+                          key={cat.href}
+                          href={cat.href}
+                          onClick={closeDrawer}
+                          className={`rounded-xl bg-[#FFF8E8] hover:bg-[#B90D12] text-[#111111] hover:text-white border border-[#B90D12]/14 px-2.5 py-2 text-xs font-extrabold text-center truncate transition ${
+                            idx === QUICK_CATEGORIES.length - 1 ? "col-span-2" : ""
+                          }`}
+                        >
+                          {cat.label}
+                        </Link>
+                      ))}
+                    </div>
                   )}
                 </div>
 
-                {/* All 5 Official Order Numbers */}
-                <div className="rounded-2xl bg-white border border-[#111111]/10 p-3 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] font-black text-[#111111]/70">
-                    <span>أرقام الطلبات والتوصيل بمدينة بدر</span>
-                    <span dir="ltr" className="font-en text-[10px] text-[#B90D12]">
-                      5 HOTLINES
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5" dir="ltr">
-                    {ORDER_PHONES.map((ph) => (
-                      <a
-                        key={ph}
-                        href={`tel:${ph}`}
-                        className="inline-flex items-center gap-1 rounded-full bg-[#FFF8E8] hover:bg-[#B90D12] text-[#111111] hover:text-white border border-[#B90D12]/20 px-2.5 py-1 text-[11px] font-en font-extrabold transition"
-                      >
-                        <PhoneIcon className="w-3 h-3 text-[#B90D12] group-hover:text-white" />
-                        <span>{ph}</span>
-                      </a>
-                    ))}
+                {/* DROPDOWN 2: صفحات الموقع */}
+                <div className="rounded-2xl bg-white border border-[#B90D12]/16 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("pages")}
+                    aria-expanded={openSection === "pages"}
+                    className="w-full px-4 py-3 flex items-center justify-between text-xs sm:text-sm font-black text-[#111111] hover:text-[#B90D12] transition cursor-pointer"
+                  >
+                    <span>تصفح صفحات الموقع</span>
+                    <ChevronDownIcon
+                      className={`w-4 h-4 text-[#B90D12] transition-transform duration-200 ${
+                        openSection === "pages" ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {openSection === "pages" && (
+                    <div className="px-3 pb-3 pt-1 border-t border-[#B90D12]/10 grid grid-cols-2 gap-1.5">
+                      {SITE_PAGES.map((pg) => {
+                        const active = pathname === pg.href;
+                        return (
+                          <Link
+                            key={pg.href}
+                            href={pg.href}
+                            onClick={closeDrawer}
+                            className={`rounded-xl px-2.5 py-2 text-xs font-extrabold text-center truncate border transition ${
+                              active
+                                ? "bg-[#B90D12] text-white border-[#B90D12]"
+                                : "bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#111111] border-[#B90D12]/14"
+                            }`}
+                          >
+                            {pg.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* DROPDOWN 3: أرقام الطلبات الخمسة */}
+                <div className="rounded-2xl bg-white border border-[#B90D12]/16 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection("phones")}
+                    aria-expanded={openSection === "phones"}
+                    className="w-full px-4 py-3 flex items-center justify-between text-xs sm:text-sm font-black text-[#111111] hover:text-[#B90D12] transition cursor-pointer"
+                  >
+                    <span>أرقام الطلبات والتوصيل (٥ خطوط)</span>
+                    <ChevronDownIcon
+                      className={`w-4 h-4 text-[#B90D12] transition-transform duration-200 ${
+                        openSection === "phones" ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {openSection === "phones" && (
+                    <div className="px-3 pb-3 pt-1 border-t border-[#B90D12]/10 grid grid-cols-2 gap-1.5" dir="ltr">
+                      {ORDER_PHONES.map((ph, idx) => (
+                        <a
+                          key={ph}
+                          href={`tel:${ph}`}
+                          className={`rounded-xl py-2 px-2.5 flex items-center justify-center gap-1.5 text-xs font-en font-black border transition ${
+                            idx === 0
+                              ? "col-span-2 bg-[#B90D12] text-white border-[#B90D12]"
+                              : "bg-[#FFF8E8] hover:bg-[#FFD21A] text-[#111111] border-[#B90D12]/18"
+                          }`}
+                        >
+                          <PhoneIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span>{ph}</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Install PWA Button (Sleek Single Line) */}
+                {!isStandalone && (
+                  <button
+                    type="button"
+                    onClick={handleInstallClick}
+                    className="w-full rounded-2xl bg-[#111111] hover:bg-[#B90D12] text-white px-4 py-3 flex items-center justify-center gap-2 text-xs font-black transition cursor-pointer"
+                  >
+                    <DownloadAppIcon className="w-4 h-4 text-[#FFD21A] shrink-0" />
+                    <span>تثبيت تطبيق مأكولات الشام على الهاتف</span>
+                  </button>
+                )}
+
+                {/* Symmetrical 4-Icon Official Social Bar */}
+                <div className="pt-1">
+                  <div className="grid grid-cols-4 gap-2">
+                    {SOCIAL_ITEMS.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <a
+                          key={item.label}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={item.label}
+                          title={item.label}
+                          className="h-11 rounded-2xl bg-white hover:bg-[#B90D12] text-[#111111] hover:text-white border border-[#B90D12]/16 grid place-items-center transition"
+                        >
+                          <Icon className="w-4 h-4" />
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
-              {/* 3. Pinned Bottom Actions in Drawer */}
-              <div className="shrink-0 p-3.5 pt-2.5 border-t border-[#111111]/10 bg-white space-y-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <a
-                    href="https://wa.me/201023182006"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full bg-[#25D366] hover:brightness-105 text-white py-2 px-3 flex items-center justify-center gap-1.5 text-xs font-black transition"
-                  >
-                    <WhatsAppIcon className="w-4 h-4" />
-                    <span>واتساب الطلبات</span>
-                  </a>
-                  <a
-                    href="tel:01023182006"
-                    className="rounded-full border border-[#B90D12]/30 bg-[#FFF8E8] hover:bg-[#B90D12] text-[#111111] hover:text-white py-2 px-3 flex items-center justify-center gap-1.5 text-xs font-black transition"
-                  >
-                    <PhoneIcon className="w-3.5 h-3.5 text-[#B90D12]" />
-                    <span className="font-en">01023182006</span>
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/menu"
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex-1 rounded-full bg-[#B90D12] hover:bg-[#780508] text-white font-black text-xs py-2.5 px-4 text-center transition"
-                  >
-                    اطلب الآن من منيو مأكولات الشام
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDrawerOpen(false);
-                      setQrOpen(true);
-                    }}
-                    aria-label="باركود منيو مأكولات الشام"
-                    title="باركود منيو مأكولات الشام (QR)"
-                    className="w-10 h-10 rounded-full bg-[#FFD21A] text-[#111111] grid place-items-center hover:brightness-105 transition active:scale-95 cursor-pointer shrink-0"
-                  >
-                    <QrCodeIcon className="w-4 h-4" />
-                  </button>
-                </div>
+              {/* 3. Pinned Symmetrical Bottom Bar (Strict Brand Theme) */}
+              <div
+                dir="ltr"
+                className="shrink-0 p-3.5 bg-white border-t border-[#B90D12]/15 grid grid-cols-2 gap-2"
+              >
+                <a
+                  href="tel:01023182006"
+                  className="rounded-full bg-[#111111] hover:bg-black text-[#FFD21A] py-2.5 px-3 flex items-center justify-center gap-1.5 text-xs font-en font-black transition"
+                >
+                  <PhoneIcon className="w-3.5 h-3.5 shrink-0" />
+                  <span>01023182006</span>
+                </a>
+                <a
+                  href="https://wa.me/201023182006"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  dir="rtl"
+                  className="rounded-full bg-[#B90D12] hover:bg-[#780508] text-white py-2.5 px-3 flex items-center justify-center gap-1.5 text-xs font-black transition"
+                >
+                  <WhatsAppIcon className="w-4 h-4 text-[#FFD21A] shrink-0" />
+                  <span>اطلب واتساب</span>
+                </a>
               </div>
             </aside>
           </div>,
           document.body,
         )}
 
-      {/* PWA Web App Install Guide Modal */}
+      {/* Install PWA Guide Modal */}
       {showInstallGuide &&
         typeof document !== "undefined" &&
         createPortal(
           <div
             dir="rtl"
-            className="fixed inset-0 z-[95] flex items-end sm:items-center justify-center p-3 sm:p-4 animate-modal-backdrop"
+            className="fixed inset-0 z-[96] flex items-center justify-center p-4 overscroll-none"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="pwa-install-title"
           >
             <div
-              className="absolute inset-0 bg-[#111111]/65 backdrop-blur-xs"
+              className="absolute inset-0 bg-[#111111]/65 backdrop-blur-xs touch-none"
               onClick={() => setShowInstallGuide(false)}
             />
-            <div className="relative w-full max-w-md rounded-3xl bg-[#FFF8E8] p-5 sm:p-6 shadow-2xl border-2 border-[#B90D12]/25 animate-modal-content">
-              <div className="flex items-start justify-between gap-3 mb-4">
-                <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/icon-192.png"
-                    alt="شاورما وبروستد مأكولات الشام"
-                    className="w-12 h-12 rounded-2xl border border-[#B90D12]/25 bg-white p-1 object-contain shrink-0"
-                  />
-                  <div className="text-right">
-                    <h3 id="pwa-install-title" className="text-base sm:text-lg font-black text-[#B90D12]">
-                      تنزيل تطبيق مأكولات الشام
-                    </h3>
-                    <p className="text-xs font-semibold text-[#111111]/70 mt-0.5">
-                      ثبّت التطبيق على شاشتك الرئيسية لطلب الشاورما والبروستد أسرع في مدينة بدر
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowInstallGuide(false)}
-                  aria-label="إغلاق"
-                  className="p-2 rounded-full bg-white text-[#111111]/70 hover:text-[#111111] cursor-pointer"
-                >
-                  <XIcon className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="relative z-10 w-full max-w-sm rounded-3xl bg-[#FFF8E8] border-2 border-[#B90D12]/25 p-5 shadow-2xl text-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-emblem.webp"
+                alt="مأكولات الشام"
+                className="w-16 h-16 mx-auto rounded-full object-contain drop-shadow-md"
+              />
+              <h3 className="text-lg font-black text-[#111111] mt-3">
+                تثبيت تطبيق مأكولات الشام
+              </h3>
 
-              {isIOS ? (
-                <div className="space-y-2.5 rounded-2xl bg-white p-4 text-xs sm:text-sm font-bold text-[#111111] border border-[#B90D12]/15 text-right">
+              {isIosDevice ? (
+                <div className="mt-4 space-y-2.5 text-xs font-bold text-[#111111]/80 bg-white rounded-2xl p-4 border border-[#B90D12]/15 text-right">
                   <div className="flex items-center gap-2.5">
                     <span className="w-6 h-6 rounded-full bg-[#B90D12] text-white text-xs font-black grid place-items-center shrink-0">
                       1
                     </span>
-                    <span className="flex items-center gap-1.5 flex-wrap">
-                      اضغط على زر المشاركة
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FFF8E8] border border-[#B90D12]/20 text-[#B90D12]">
-                        <ShareIosIcon className="w-3.5 h-3.5" />
-                        <span>Share</span>
-                      </span>
-                      في المتصفح
+                    <span className="inline-flex items-center gap-1 flex-wrap">
+                      اضغط على زر المشاركة <ShareIosIcon className="w-4 h-4 text-[#B90D12] inline" /> في متصفح Safari
                     </span>
                   </div>
                   <div className="flex items-center gap-2.5">
@@ -724,32 +633,20 @@ export default function Header() {
                     </span>
                     <span>اختر «إضافة إلى الشاشة الرئيسية» (Add to Home Screen)</span>
                   </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-full bg-[#B90D12] text-white text-xs font-black grid place-items-center shrink-0">
-                      3
-                    </span>
-                    <span>اضغط «إضافة» (Add) بأعلى الشاشة</span>
-                  </div>
                 </div>
               ) : (
-                <div className="space-y-2.5 rounded-2xl bg-white p-4 text-xs sm:text-sm font-bold text-[#111111] border border-[#B90D12]/15 text-right">
+                <div className="mt-4 space-y-2.5 text-xs font-bold text-[#111111]/80 bg-white rounded-2xl p-4 border border-[#B90D12]/15 text-right">
                   <div className="flex items-center gap-2.5">
                     <span className="w-6 h-6 rounded-full bg-[#B90D12] text-white text-xs font-black grid place-items-center shrink-0">
                       1
                     </span>
-                    <span>افتح قائمة المتصفح (⋮) في أعلى الشاشة</span>
+                    <span>افتح قائمة المتصفح العلوية</span>
                   </div>
                   <div className="flex items-center gap-2.5">
                     <span className="w-6 h-6 rounded-full bg-[#B90D12] text-white text-xs font-black grid place-items-center shrink-0">
                       2
                     </span>
                     <span>اختر «تثبيت التطبيق» أو «الإضافة إلى الشاشة الرئيسية»</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-full bg-[#B90D12] text-white text-xs font-black grid place-items-center shrink-0">
-                      3
-                    </span>
-                    <span>أكد التثبيت ليظهر تطبيق مأكولات الشام على موبايلك فورًا</span>
                   </div>
                 </div>
               )}
@@ -760,7 +657,7 @@ export default function Header() {
                 className="w-full mt-4 rounded-full bg-[#B90D12] hover:bg-[#780508] text-white font-black text-sm py-3 flex items-center justify-center gap-2 transition cursor-pointer"
               >
                 <CheckIcon className="w-4 h-4" />
-                <span>تمام، فهمت</span>
+                <span>تمام</span>
               </button>
             </div>
           </div>,

@@ -172,9 +172,14 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-3.5 no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:pb-0">
             {activeOffers.map((o) => (
-              <OfferCard key={o.id} offer={o} />
+              <div
+                key={o.id}
+                className="w-[80vw] max-w-[305px] sm:w-[295px] lg:w-auto shrink-0 snap-start"
+              >
+                <OfferCard offer={o} />
+              </div>
             ))}
           </div>
         </section>

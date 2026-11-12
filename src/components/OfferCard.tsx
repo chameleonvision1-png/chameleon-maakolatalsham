@@ -92,7 +92,7 @@ export default function OfferCard({ offer }: { offer: Offer }) {
             }}
             className={`rounded-full px-4 py-2 text-xs font-black flex items-center gap-1.5 transition cursor-pointer ${
               added
-                ? "bg-[#19B536] text-white"
+                ? "bg-[#111111] text-[#FFD21A]"
                 : "bg-[#B90D12] hover:bg-[#780508] text-white"
             }`}
           >

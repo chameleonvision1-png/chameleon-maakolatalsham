@@ -43,7 +43,7 @@
   --color-cream-200: #F5D8A0;
   --color-honey: #FFD21A;
   --color-berry: #B90D12;
-  --color-leaf: #19B536;
+  --color-leaf: #B90D12;
   --color-plum: #780508;
   --color-ink: #111111;
   --color-cocoa: #2B080A;
@@ -146,8 +146,14 @@ body {
   color: var(--color-white);
 }
 .btn-whatsapp {
-  background: #25d366;
+  background: var(--color-black);
+  color: var(--brand-yellow);
+  border: 1.5px solid rgba(255, 210, 26, 0.45);
+}
+.btn-whatsapp:hover {
+  background: var(--brand-red);
   color: var(--color-white);
+  border-color: var(--brand-red);
 }
 
 /* Tilted Golden-Yellow Sticker Pill (Matches Lafet Shamia Reference) */
