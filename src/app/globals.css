@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+:root {
+  /* =========================================================================
+     MAAKOLAT AL SHAM — NON-NEGOTIABLE OFFICIAL BRAND TOKENS
+     ========================================================================= */
+  --brand-red: #B90D12;
+  --brand-yellow: #FFD21A;
+  --brand-deep-red: #780508;
+  --brand-gold: #F2A900;
+
+  --color-black: #111111;
+  --color-white: #FFFFFF;
+  --color-beige: #F5D8A0;
+  --color-cream: #FFF8E8;
+
+  --color-red-light: #E53935;
+  --color-red-hover: #A20B10;
+  --color-yellow-light: #FFE680;
+  --color-gold-dark: #C98A00;
+  --color-soft-gray: #F2F2F2;
+  --color-border: #E5E5E5;
+
+  --color-background: #FFF8E8;
+  --color-surface: #FFFFFF;
+  --color-primary-hover: #780508;
+  --color-secondary-hover: #F2A900;
+
+  --container-7xl: 100%;
+  --container-6xl: 100%;
+}
+
+@theme inline {
+  --color-brand: #B90D12;
+  --color-brand-600: #A20B10;
+  --color-brand-700: #780508;
+  --color-brand-50: #FFF3F3;
+  --color-navy: #111111;
+  --color-teal: #B90D12;
+  --color-teal-50: #FFF8E8;
+  --color-cyan: #FFD21A;
+  --color-cream: #FFF8E8;
+  --color-cream-200: #F5D8A0;
+  --color-honey: #FFD21A;
+  --color-berry: #B90D12;
+  --color-leaf: #19B536;
+  --color-plum: #780508;
+  --color-ink: #111111;
+  --color-cocoa: #2B080A;
+  --font-sans: var(--font-cairo), system-ui, sans-serif;
+  --font-display: var(--font-cairo), system-ui, sans-serif;
+  --font-en: var(--font-inter), var(--font-cairo), system-ui, sans-serif;
+}
+
+.max-w-7xl,
+.max-w-6xl {
+  max-width: 100% !important;
+}
+@media (min-width: 1024px) {
+  .max-w-7xl,
+  .max-w-6xl {
+    padding-inline: 2.5rem !important;
+  }
+}
+
+html {
+  scrollbar-width: none;
+  overflow-x: clip;
+  max-width: 100vw;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  overflow-x: clip;
+  max-width: 100vw;
+  width: 100%;
+  background: var(--color-cream);
+  color: var(--color-black);
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-en {
+  font-family: var(--font-inter), var(--font-cairo), sans-serif;
+  letter-spacing: 0.02em;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* No-scrollbar utility for horizontal snap carousels */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Unified Button System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 800;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary {
+  background: var(--brand-red);
+  color: var(--color-white);
+  box-shadow: 0 10px 24px -8px rgb(185 13 18 / 0.42);
+}
+.btn-primary:hover {
+  background: var(--brand-deep-red);
+}
+.btn-secondary {
+  background: var(--brand-yellow);
+  color: var(--color-black);
+  box-shadow: 0 8px 20px -8px rgb(242 169 0 / 0.38);
+}
+.btn-secondary:hover {
+  background: var(--brand-gold);
+}
+.btn-teal {
+  background: var(--brand-red);
+  color: var(--color-white);
+}
+.btn-teal:hover {
+  background: var(--brand-deep-red);
+}
+.btn-outline {
+  border: 2px solid var(--brand-red);
+  color: var(--brand-red);
+  background: var(--color-white);
+}
+.btn-outline:hover {
+  background: var(--brand-red);
+  color: var(--color-white);
+}
+.btn-whatsapp {
+  background: #25d366;
+  color: var(--color-white);
+}
+
+/* Tilted Golden-Yellow Sticker Pill (Matches Lafet Shamia Reference) */
+.sticker-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: var(--brand-yellow);
+  color: var(--color-black);
+  font-weight: 900;
+  font-size: 0.74rem;
+  line-height: 1.2;
+  padding: 0.32rem 0.9rem;
+  border-radius: 9999px;
+  transform: rotate(-5deg);
+  box-shadow: 0 6px 14px -6px rgba(17, 17, 17, 0.25);
+}
+
+.card {
+  background: var(--color-white);
+  border-radius: 1.5rem;
+  border: 1.5px solid var(--color-border);
+  box-shadow: 0 2px 8px rgb(17 17 17 / 0.04), 0 12px 28px -16px rgb(185 13 18 / 0.1);
+}
+
+.input {
+  width: 100%;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-white);
+  border-radius: 0.875rem;
+  padding: 0.7rem 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.input:focus {
+  border-color: var(--brand-red);
+}
+
+@keyframes pop {
+  0% { transform: scale(0.8); }
+  60% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.animate-pop {
+  animation: pop 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
